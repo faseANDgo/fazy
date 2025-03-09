@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dynamiczna Tabela Obwodów i Wykres</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin: 0;
+            }
+            .container {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: flex-start;
+                justify-content: center;
+                margin: 20px;
+                width: 100%;
+            }
+            .table-container {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: auto;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
+            table, th, td {
+                border: 1px solid black;
+            }
+            th, td {
+                padding: 8px;
+                text-align: left;
+                white-space: nowrap;
+            }
+            select, input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            /* Reintroduce column widths */
+            th.narrow, td.narrow {
+                width: 1%;
+                white-space: nowrap;
+                text-align: center;
+            }
+            th.small, td.small {
+                min-width: 10px;
+                width: 1;
+                white-space: nowrap;
+                text-align: center;
+            }
+            th.moc, td.moc {
+                width: 1%;
+                white-space: nowrap;
+                text-align: center;
+            }
+            th.medium, td.medium {
+                width: auto;
+            }
+            th.wide, td.wide {
+                width: auto;
+            }
+            #chartContainer {
+                width: 35%;
+                max-width: 400px;
+                margin-left: 20px;
+                position: relative;
+                height: 300px; /* Set a fixed height */
+            }
+            #chartContainer canvas {
+                width: 100% !important;
+                height: 100% !important;
+            }
+            .button-container {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-bottom: 20px;
+                width: 100%;
+            }
+            .button-container button {
+                margin: 5px;
+                padding: 10px 20px;
+                font-size: 16px;
+                flex: 1;
+            }
+            .button-container .wide-buttons {
+                width: calc(100% / 3 - 20px);
+            }
+            .summary-box {
+                text-align: center;
+                margin-bottom: 20px;
+                font-size: 18px;
+                padding: 10px;
+                background-color: #f0f0f0;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                font-family: "Georgia", serif;
+            }
+            @media (max-width: 800px) {
+                .container {
+                    flex-direction: column;
+                    align-items: center;
+                }
+                .table-container, #chartContainer {
+                    width: 100%;
+                    max-width: 100%;
+                    margin: 0;
+                }
+                #chartContainer {
+                    margin-top: 20px;
+                }
+                .button-container .wide-buttons {
+                    width: 100%;
+                }
+                .button-container button {
+                    width: 100%;
+                }
+            }
+            .delete-btn {
+                color: red;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            .disabled {
+                pointer-events: none;
+                opacity: 0.6;
+            }
+            .sort-active {
+                background-color: #ffcccb;
+            }
+            /* Adjust padding and font sizes with media queries */
+            @media (max-width: 600px) {
+                th, td {
+                    padding: 4px;
+                    font-size: 12px;
+                }
+            }
+            @media (min-width: 1200px) {
+                th, td {
+                    padding: 12px;
+                    font-size: 16px;
+                }
+            }
+        </style>
+        <!-- Include your scripts as before -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        ></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.18/jspdf.plugin.autotable.min.js"
+        ></script>
+        <script>
+            let rowIndex = 1;
+            let originalRows = [];
+            let isSorted = false;
+            let chart; // Declare chart variable globally
+
+            function addRow() {
+                if (isSorted) return;
+
+                const table =
+                    document.getElementById("obwodyTable").getElementsByTagName(
+                        "tbody",
+                    )[0];
+                const lastRow = table.rows[table.rows.length - 1];
+                if (
+                    lastRow &&
+                    Array.from(lastRow.querySelectorAll("input, select")).some(
+                        (input) => !input.value
+                    )
+                ) {
+                    return;
+                }
+
+                const row = table.insertRow();
+                row.innerHTML = `
+                <td class="narrow">${rowIndex}</td>
+                <td class="wide">
+                    <input list="nazwa_obwodu_list" name="nazwa_obwodu">
+                </td>
+                <td class="medium">
+                    <select name="przewód">
+                        <option value="">Wybierz</option>
+                        <option value="3x2.5 mm²">3x2.5 mm²</option>
+                        <option value="3x1.5 mm²">3x1.5 mm²</option>
+                        <option value="4x1.5 mm²">4x1.5 mm²</option>
+                        <option value="5x1.5 mm²">5x1.5 mm²</option>
+                        <option value="5x2.5 mm²">5x2.5 mm²</option>
+                        <option value="5x4 mm²">5x4 mm²</option>
+                        <option value="5x6 mm²">5x6 mm²</option>
+                    </select>
+                </td>
+                <td class="moc"><input type="number" name="moc" min="0" /></td>
+                <td class="small">
+                    <select name="napiecie">
+                        <option value="">Wybierz</option>
+                        <option value="230V">230V</option>
+                        <option value="400V">400V</option>
+                    </select>
+                </td>
+                <td class="small">
+                    <select name="faza">
+                        <option value="">Wybierz</option>
+                        <option value="L1">L1</option>
+                        <option value="L2">L2</option>
+                        <option value="L3">L3</option>
+                        <option value="L1+L2+L3">L1+L2+L3</option>
+                    </select>
+                </td>
+                <td class="small"><span class="delete-btn" onclick="deleteRow(this)">X</span></td>
+            `;
+                rowIndex++;
+                const inputs = row.querySelectorAll("input, select");
+                inputs.forEach((input) => {
+                    input.addEventListener("input", handleInputChange);
+                });
+
+                // Append datalist only once to the document
+                if (!document.getElementById("nazwa_obwodu_list")) {
+                    const datalist = document.createElement("datalist");
+                    datalist.id = "nazwa_obwodu_list";
+                    datalist.innerHTML = `
+                    <option value="Kuchnia">
+                    <option value="Salon">
+                    <option value="Jadalnia">
+                    <option value="Pokój Dziecka">
+                    <option value="Klimatyzacja">
+                `;
+                    document.body.appendChild(datalist);
+                }
+
+                // Associate the datalist with the input
+                const nazwaInput = row.cells[1].querySelector(
+                    'input[name="nazwa_obwodu"]',
+                );
+                nazwaInput.setAttribute("list", "nazwa_obwodu_list");
+
+                saveOriginalRows();
+            }
+
+            function saveOriginalRows() {
+                const table =
+                    document.getElementById("obwodyTable").getElementsByTagName(
+                        "tbody",
+                    )[0];
+                originalRows = Array.from(table.getElementsByTagName("tr")).map(
+                    (row) => ({
+                        nr: row.cells[0].innerText,
+                        nazwa: row.cells[1].querySelector("input").value,
+                        przewod: row.cells[2].querySelector("select").value,
+                        moc: row.cells[3].querySelector("input").value,
+                        napiecie: row.cells[4].querySelector("select").value,
+                        faza: row.cells[5].querySelector("select").value,
+                    })
+                );
+                localStorage.setItem("obwodyData", JSON.stringify(originalRows));
+            }
+
+            function restoreOriginalRows() {
+                isSorted = false;
+                toggleSortState();
+                const table =
+                    document.getElementById("obwodyTable").getElementsByTagName(
+                        "tbody",
+                    )[0];
+                table.innerHTML = "";
+                rowIndex = 1; // Reset rowIndex
+                originalRows.forEach((data) => {
+                    const row = table.insertRow();
+                    row.innerHTML = `
+                    <td class="narrow">${rowIndex}</td>
+                    <td class="wide"><input list="nazwa_obwodu_list" name="nazwa_obwodu" value="${data.nazwa}"></td>
+                    <td class="medium">
+                        <select name="przewód">
+                            <option value="">Wybierz</option>
+                            <option value="3x2.5 mm²" ${
+                        data.przewod === "3x2.5 mm²" ? "selected" : ""
+                    }>3x2.5 mm²</option>
+                            <option value="3x1.5 mm²" ${
+                        data.przewod === "3x1.5 mm²" ? "selected" : ""
+                    }>3x1.5 mm²</option>
+                            <option value="4x1.5 mm²" ${
+                        data.przewod === "4x1.5 mm²" ? "selected" : ""
+                    }>4x1.5 mm²</option>
+                            <option value="5x1.5 mm²" ${
+                        data.przewod === "5x1.5 mm²" ? "selected" : ""
+                    }>5x1.5 mm²</option>
+                            <option value="5x4 mm²" ${
+                        data.przewod === "5x4 mm²" ? "selected" : ""
+                    }>5x4 mm²</option>
+                            <option value="5x6 mm²" ${
+                        data.przewod === "5x6 mm²" ? "selected" : ""
+                    }>5x6 mm²</option>
+                        </select>
+                    </td>
+                    <td class="moc"><input type="number" name="moc" min="0" value="${data.moc}"></td>
+                    <td class="small">
+                        <select name="napiecie">
+                            <option value="">Wybierz</option>
+                            <option value="230V" ${
+                        data.napiecie === "230V" ? "selected" : ""
+                    }>230V</option>
+                            <option value="400V" ${
+                        data.napiecie === "400V" ? "selected" : ""
+                    }>400V</option>
+                        </select>
+                    </td>
+                    <td class="small">
+                        <select name="faza">
+                            <option value="">Wybierz</option>
+                            <option value="L1" ${
+                        data.faza === "L1" ? "selected" : ""
+                    }>L1</option>
+                            <option value="L2" ${
+                        data.faza === "L2" ? "selected" : ""
+                    }>L2</option>
+                            <option value="L3" ${
+                        data.faza === "L3" ? "selected" : ""
+                    }>L3</option>
+                            <option value="L1+L2+L3" ${
+                        data.faza === "L1+L2+L3" ? "selected" : ""
+                    }>L1+L2+L3</option>
+                        </select>
+                    </td>
+                    <td class="small"><span class="delete-btn" onclick="deleteRow(this)">X</span></td>
+                `;
+                    rowIndex++;
+
+                    // Associate the datalist with the input
+                    const nazwaInput = row.cells[1].querySelector(
+                        'input[name="nazwa_obwodu"]',
+                    );
+                    nazwaInput.setAttribute("list", "nazwa_obwodu_list");
+                });
+                addInputListeners();
+                updateChart();
+                updateSummary();
+                ensureOneEmptyRow();
+            }
+
+            function loadDataFromLocalStorage() {
+                const data = localStorage.getItem("obwodyData");
+                if (data) {
+                    originalRows = JSON.parse(data);
+                    restoreOriginalRows();
+                } else {
+                    addRow(); // Add the first row if no data in localStorage
+                }
+            }
+
+            function deleteRow(btn) {
+                if (isSorted) return;
+
+                const row = btn.closest("tr");
+                row.remove();
+                updateRowNumbers();
+                updateChart();
+                updateSummary();
+                saveOriginalRows();
+                ensureOneEmptyRow();
+            }
+
+            function updateRowNumbers() {
+                const table =
+                    document.getElementById("obwodyTable").getElementsByTagName(
+                        "tbody",
+                    )[0];
+                const rows = table.getElementsByTagName("tr");
+                for (let i = 0; i < rows.length; i++) {
+                    rows[i].cells[0].innerText = i + 1;
+                }
+                rowIndex = rows.length + 1;
+            }
+
+            function ensureOneEmptyRow() {
+                const table =
+                    document.getElementById("obwodyTable").getElementsByTagName(
+                        "tbody",
+                    )[0];
+                const rows = table.getElementsByTagName("tr");
+                const lastRow = rows[rows.length - 1];
+                if (
+                    !lastRow ||
+                    Array.from(lastRow.querySelectorAll("input, select")).some(
+                        (input) => input.value
+                    )
+                ) {
+                    addRow();
+                }
+            }
+
+            function checkAndAddRow(event) {
+                if (isSorted) return;
+
+                const row = event.target.closest("tr");
+                const allFilled = Array.from(row.querySelectorAll("input, select"))
+                    .every((input) => input.value);
+                const nextRow = row.nextElementSibling;
+                if (
+                    allFilled &&
+                    (!nextRow ||
+                        Array.from(nextRow.querySelectorAll("input, select")).every(
+                            (input) => !input.value
+                        ))
+                ) {
+                    addRow();
+                }
+            }
+
+            function handleInputChange(event) {
+                if (isSorted) return;
+
+                checkAndAddRow(event);
+                updateChart();
+                updateSummary();
+                saveOriginalRows();
+            }
+
+            function updateChart() {
+                if (!chart) return;
+                const table =
+                    document.getElementById("obwodyTable").getElementsByTagName(
+                        "tbody",
+                    )[0];
+                const rows = table.getElementsByTagName("tr");
+                let counts = { L1: 0, L2: 0, L3: 0 };
+
+                Array.from(rows).forEach((row) => {
+                    const moc =
+                        parseFloat(row.querySelector('input[name="moc"]').value) || 0;
+                    const faza = row.querySelector('select[name="faza"]').value;
+                    if (faza) {
+                        if (faza === "L1+L2+L3") {
+                            counts.L1 += moc;
+                            counts.L2 += moc;
+                            counts.L3 += moc;
+                        } else if (counts[faza] !== undefined) {
+                            counts[faza] += moc;
+                        }
+                    }
+                });
+
+                chart.data.datasets[0].data = [counts.L1, counts.L2, counts.L3];
+                chart.update();
+            }
+
+            function updateSummary() {
+                const table =
+                    document.getElementById("obwodyTable").getElementsByTagName(
+                        "tbody",
+                    )[0];
+                const rows = table.getElementsByTagName("tr");
+                let totalPower = 0;
+
+                Array.from(rows).forEach((row) => {
+                    const moc =
+                        parseFloat(row.querySelector('input[name="moc"]').value) || 0;
+                    totalPower += moc;
+                });
+
+                const reportedPower = totalPower * 0.6;
+                document.getElementById("reportedPower").innerText =
+                    reportedPower.toFixed(2) + " kW";
+            }
+
+            // Add this new function to handle Polish characters conversion
+            function convertPolishChars(text) {
+                const polishChars = {
+                    'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n', 
+                    'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z',
+                    'Ą': 'A', 'Ć': 'C', 'Ę': 'E', 'Ł': 'L', 'Ń': 'N', 
+                    'Ó': 'O', 'Ś': 'S', 'Ź': 'Z', 'Ż': 'Z'
+                };
+                return text.replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, char => polishChars[char] || char);
+            }
+
+            // Modify the data mapping in generatePDF
+            function generatePDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                const robotoFont = "https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf";
+
+                fetch(robotoFont)
+                    .then(response => response.arrayBuffer())
+                    .then(fontBuffer => {
+                        doc.addFont(fontBuffer, "Roboto", "normal");
+                        doc.setFont("Roboto", "normal");
+
+                        const table = document.getElementById("obwodyTable").getElementsByTagName("tbody")[0];
+                        const rows = Array.from(table.getElementsByTagName("tr"));
+
+                        const data = rows.map((row) => {
+                            const cells = row.getElementsByTagName("td");
+                            return [
+                                convertPolishChars(cells[0].innerText),
+                                convertPolishChars(cells[1].querySelector("input").value),
+                                convertPolishChars(cells[2].querySelector("select").value),
+                                convertPolishChars(cells[3].querySelector("input").value),
+                                convertPolishChars(cells[4].querySelector("select").value),
+                                convertPolishChars(cells[5].querySelector("select").value),
+                            ];
+                        });
+
+                        // Convert headers as well
+                        const headers = [
+                            "Nr Obwodu",
+                            "Nazwa Obwodu", 
+                            "Przewod",
+                            "Moc kW",
+                            "Napiecie",
+                            "Faza",
+                        ].map(header => convertPolishChars(header));
+
+                        doc.autoTable({
+                            head: [headers],
+                            body: data,
+                            styles: {
+                                font: "Roboto",
+                                fontSize: 10,
+                            },
+                            columnStyles: {
+                                0: { cellWidth: 20 },
+                                1: { cellWidth: 50 },
+                                2: { cellWidth: 30 },
+                                3: { cellWidth: 20 },
+                                4: { cellWidth: 30 },
+                                5: { cellWidth: 40 },
+                            },
+                        });
+
+                        doc.save("tabela_obwodow.pdf");
+                    })
+                    .catch(error => {
+                        console.error('Error loading font:', error);
+                        generatePDFWithHelvetica();
+                    });
+            }
+
+            // Fallback function using helvetica
+            function generatePDFWithHelvetica() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                doc.setFont("helvetica", "normal");
+
+                const table = document.getElementById("obwodyTable").getElementsByTagName("tbody")[0];
+                const rows = Array.from(table.getElementsByTagName("tr"));
+
+                const data = rows.map((row) => {
+                    const cells = row.getElementsByTagName("td");
+                    return [
+                        convertPolishChars(cells[0].innerText),
+                        convertPolishChars(cells[1].querySelector("input").value),
+                        convertPolishChars(cells[2].querySelector("select").value),
+                        convertPolishChars(cells[3].querySelector("input").value),
+                        convertPolishChars(cells[4].querySelector("select").value),
+                        convertPolishChars(cells[5].querySelector("select").value),
+                    ];
+                });
+
+                const headers = [
+                    "Nr Obwodu",
+                    "Nazwa Obwodu", 
+                    "Przewod",
+                    "Moc kW",
+                    "Napiecie",
+                    "Faza",
+                ].map(header => convertPolishChars(header));
+
+                doc.autoTable({
+                    head: [headers],
+                    body: data,
+                    styles: {
+                        font: "helvetica",
+                        fontSize: 10,
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 20 },
+                        1: { cellWidth: 50 },
+                        2: { cellWidth: 30 },
+                        3: { cellWidth: 20 },
+                        4: { cellWidth: 30 },
+                        5: { cellWidth: 40 },
+                    },
+                });
+
+                doc.save("tabela_obwodow.pdf");
+            }
+
+            // Update the generateOpisPDF function similarly
+            function generateOpisPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                const robotoFont = "https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf";
+
+                fetch(robotoFont)
+                    .then(response => response.arrayBuffer())
+                    .then(fontBuffer => {
+                        doc.addFont(fontBuffer, "Roboto", "normal");
+                        doc.setFont("Roboto", "normal");
+
+                        const table = document.getElementById("obwodyTable").getElementsByTagName("tbody")[0];
+                        const rows = Array.from(table.getElementsByTagName("tr")).filter(
+                            (row) => {
+                                const inputs = row.querySelectorAll("input, select");
+                                return Array.from(inputs).some((input) => input.value);
+                            },
+                        );
+
+                        const data = rows.map((row) => {
+                            const cells = row.getElementsByTagName("td");
+                            return [
+                                convertPolishChars(cells[0].innerText),
+                                convertPolishChars(cells[1].querySelector("input").value),
+                            ];
+                        });
+
+                        // Convert headers as well
+                        const headers = ["Nr Obwodu", "Nazwa Obwodu"].map(header => convertPolishChars(header));
+
+                        doc.autoTable({
+                            head: [headers],
+                            body: data,
+                            styles: {
+                                font: "Roboto",
+                                fontSize: 10,
+                            },
+                            columnStyles: {
+                                0: { cellWidth: 20 },
+                                1: { cellWidth: 50 },
+                            },
+                        });
+
+                        doc.save("opis_rozdzielnicy.pdf");
+                    })
+                    .catch(error => {
+                        console.error('Error loading font:', error);
+                        generateOpisPDFWithHelvetica();
+                    });
+            }
+
+            // Fallback function using helvetica
+            function generateOpisPDFWithHelvetica() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                doc.setFont("helvetica", "normal");
+
+                const table = document.getElementById("obwodyTable").getElementsByTagName("tbody")[0];
+                const rows = Array.from(table.getElementsByTagName("tr")).filter(
+                    (row) => {
+                        const inputs = row.querySelectorAll("input, select");
+                        return Array.from(inputs).some((input) => input.value);
+                    },
+                );
+
+                const data = rows.map((row) => {
+                    const cells = row.getElementsByTagName("td");
+                    return [
+                        convertPolishChars(cells[0].innerText),
+                        convertPolishChars(cells[1].querySelector("input").value),
+                    ];
+                });
+
+                const headers = ["Nr Obwodu", "Nazwa Obwodu"].map(header => convertPolishChars(header));
+
+                doc.autoTable({
+                    head: [headers],
+                    body: data,
+                    styles: {
+                        font: "helvetica",
+                        fontSize: 10,
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 20 },
+                        1: { cellWidth: 50 },
+                    },
+                });
+
+                doc.save("opis_rozdzielnicy.pdf");
+            }
+
+            function filterTable(faza) {
+                const table =
+                    document.getElementById("obwodyTable").getElementsByTagName(
+                        "tbody",
+                    )[0];
+                const rows = table.getElementsByTagName("tr");
+                Array.from(rows).forEach((row) => {
+                    const fazaValue = row.querySelector('select[name="faza"]').value;
+                    row.style.display = (fazaValue === faza || faza === "all")
+                        ? ""
+                        : "none";
+                });
+            }
+
+            function addInputListeners() {
+                const table =
+                    document.getElementById("obwodyTable").getElementsByTagName(
+                        "tbody",
+                    )[0];
+                const rows = table.getElementsByTagName("tr");
+                Array.from(rows).forEach((row) => {
+                    const inputs = row.querySelectorAll("input, select");
+                    inputs.forEach((input) => {
+                        input.addEventListener("input", handleInputChange);
+                    });
+                });
+            }
+
+            function sortTableByPhase() {
+                if (isSorted) return;
+
+                const table =
+                    document.getElementById("obwodyTable").getElementsByTagName(
+                        "tbody",
+                    )[0];
+                const rows = Array.from(table.getElementsByTagName("tr"));
+
+                rows.sort((a, b) => {
+                    const phaseOrder = { "L1": 1, "L2": 2, "L3": 3, "L1+L2+L3": 4 };
+                    const phaseA = a.querySelector('select[name="faza"]').value;
+                    const phaseB = b.querySelector('select[name="faza"]').value;
+                    return (phaseOrder[phaseA] || 5) - (phaseOrder[phaseB] || 5);
+                });
+
+                rows.forEach((row) => table.appendChild(row));
+                isSorted = true;
+                toggleSortState();
+            }
+
+            function toggleSortState() {
+                const table = document.getElementById("obwodyTable");
+                const inputs = table.querySelectorAll("input, select");
+                inputs.forEach((input) => {
+                    input.disabled = isSorted;
+                });
+
+                const sortButton = document.getElementById("sortButton");
+                if (isSorted) {
+                    sortButton.classList.add("sort-active");
+                } else {
+                    sortButton.classList.remove("sort-active");
+                }
+            }
+
+            function clearData() {
+                if (confirm("Czy na pewno chcesz wyczyścić wszystkie dane?")) {
+                    // Clear localStorage
+                    localStorage.removeItem("obwodyData");
+
+                    // Clear the table body
+                    const tableBody =
+                        document.getElementById("obwodyTable").getElementsByTagName(
+                            "tbody",
+                        )[0];
+                    tableBody.innerHTML = "";
+
+                    // Reset variables
+                    rowIndex = 1;
+                    originalRows = [];
+                    isSorted = false;
+                    toggleSortState();
+
+                    // Add the initial empty row
+                    addRow();
+
+                    // Update the chart and summary
+                    updateChart();
+                    updateSummary();
+                }
+            }
+
+            function generateSampleData() {
+                if (
+                    confirm(
+                        "Czy chcesz wygenerować przykładowe dane? Spowoduje to usunięcie obecnych danych.",
+                    )
+                ) {
+                    const sampleData = [
+                        ["1", "Oświetlenie parter 1", "3x1.5 mm²", "0.5", "230V", "L1"],
+                        ["2", "Oświetlenie parter 2", "3x1.5 mm²", "0.5", "230V", "L2"],
+                        ["3", "Oświetlenie parter 3", "3x1.5 mm²", "0.5", "230V", "L3"],
+                        ["4", "Oświetlenie garaż", "3x1.5 mm²", "0.5", "230V", "L1"],
+                        [
+                            "5",
+                            "Oświetlenie zewnątrz 1",
+                            "3x1.5 mm²",
+                            "0.5",
+                            "230V",
+                            "L1",
+                        ],
+                        [
+                            "6",
+                            "Oświetlenie zewnątrz 2",
+                            "3x1.5 mm²",
+                            "0.5",
+                            "230V",
+                            "L1",
+                        ],
+                        [
+                            "7",
+                            "Brama wjazdowa zewnętrzna",
+                            "3x1.5 mm²",
+                            "0.5",
+                            "230V",
+                            "L1",
+                        ],
+                        [
+                            "8",
+                            "Gniazda pokój dziecka 1",
+                            "3x2.5 mm²",
+                            "0.5",
+                            "230V",
+                            "L2",
+                        ],
+                        [
+                            "9",
+                            "Gniazda pokój dziecka 2",
+                            "3x2.5 mm²",
+                            "0.5",
+                            "230V",
+                            "L3",
+                        ],
+                        [
+                            "10",
+                            "Gniazda pokój dziecka 3",
+                            "3x2.5 mm²",
+                            "0.5",
+                            "230V",
+                            "L1",
+                        ],
+                        ["11", "Gniazda salon", "3x2.5 mm²", "0.5", "230V", "L2"],
+                        [
+                            "12",
+                            "Gniazda kuchnia robocze 1",
+                            "3x2.5 mm²",
+                            "2",
+                            "230V",
+                            "L3",
+                        ],
+                        [
+                            "13",
+                            "Gniazda kuchnia robocze 2",
+                            "3x2.5 mm²",
+                            "2",
+                            "230V",
+                            "L1",
+                        ],
+                        ["14", "Gniazda zmywarka", "3x2.5 mm²", "1", "230V", "L2"],
+                        ["15", "Gniazda piekarnik", "3x2.5 mm²", "2.5", "230V", "L3"],
+                        ["16", "Gniazda lodówka", "3x2.5 mm²", "0.5", "230V", "L1"],
+                        [
+                            "17",
+                            "Gniazda mikrofalówka",
+                            "3x2.5 mm²",
+                            "1.5",
+                            "230V",
+                            "L2",
+                        ],
+                        [
+                            "18",
+                            "Gniazda ekspres do kawy",
+                            "3x2.5 mm²",
+                            "1",
+                            "230V",
+                            "L2",
+                        ],
+                        [
+                            "19",
+                            "Gniazda młynek do odpadów",
+                            "3x2.5 mm²",
+                            "1",
+                            "230V",
+                            "L1",
+                        ],
+                        ["20", "Gniazda pochłaniacz", "3x2.5 mm²", "0.5", "230V", "L2"],
+                        [
+                            "21",
+                            "Gniazda płyta grzewcza/indukcyjna",
+                            "5x4 mm²",
+                            "9",
+                            "400V",
+                            "L1+L2+L3",
+                        ],
+                        ["22", "Gniazda hol", "3x2.5 mm²", "0.5", "230V", "L2"],
+                        ["23", "Gniazda łazienka 1", "3x2.5 mm²", "0.5", "230V", "L1"],
+                        ["24", "Gniazda łazienka 2", "3x2.5 mm²", "0.5", "230V", "L2"],
+                        ["25", "Gniazda garaż", "3x2.5 mm²", "1", "230V", "L3"],
+                        [
+                            "26",
+                            "Gniazda garaż 400V",
+                            "5x4 mm²",
+                            "3",
+                            "400V",
+                            "L1+L2+L3",
+                        ],
+                        ["27", "Bojler", "3x2.5 mm²", "2", "230V", "L1"],
+                        ["28", "Rekuperacja", "3x2.5 mm²", "1.5", "230V", "L2"],
+                        ["29", "Klimatyzacja", "3x2.5 mm²", "2.5", "230V", "L3"],
+                        ["30", "Uzdatniacz wody", "3x2.5 mm²", "0.5", "230V", "L1"],
+                        ["31", "Alarm", "3x1.5 mm²", "0.5", "230V", "L2"],
+                        ["32", "Rekuperator", "3x2.5 mm²", "0.5", "230V", "L3"],
+                        [
+                            "33",
+                            "Kabel grzejny w podjeździe",
+                            "3x2.5 mm²",
+                            "2.5",
+                            "230V",
+                            "L1",
+                        ],
+                        [
+                            "34",
+                            "Tablica multimedialna",
+                            "3x2.5 mm²",
+                            "0.5",
+                            "230V",
+                            "L2",
+                        ],
+                        ["35", "Pralka", "3x2.5 mm²", "2", "230V", "L2"],
+                        ["36", "Brama garażowa", "3x1.5 mm²", "0.5", "230V", "L1"],
+                        ["37", "Pompa ciepła", "5x4 mm²", "2.5", "400V", "L1+L2+L3"],
+                        ["38", "Gniazda zewnętrzne", "3x2.5 mm²", "0.5", "230V", "L2"],
+                        ["39", "Jacuzzi", "5x4 mm²", "7", "400V", "L1+L2+L3"],
+                        [
+                            "40",
+                            "Zasilanie do basenu",
+                            "5x4 mm²",
+                            "7",
+                            "400V",
+                            "L1+L2+L3",
+                        ],
+                        ["41", "Altana", "3x2.5 mm²", "0.5", "230V", "L3"],
+                        ["42", "Kabel grzejny rynny", "3x2.5 mm²", "1.5", "230V", "L2"],
+                        [
+                            "43",
+                            "Grzejnik elektryczny łazienka",
+                            "3x2.5 mm²",
+                            "1.5",
+                            "230V",
+                            "L3",
+                        ],
+                        [
+                            "44",
+                            "Ogrzewanie na tarasie",
+                            "5x4 mm²",
+                            "4",
+                            "400V",
+                            "L1+L2+L3",
+                        ],
+                        [
+                            "45",
+                            "Stacja dokująca do kosiarki",
+                            "3x2.5 mm²",
+                            "0.5",
+                            "230V",
+                            "L1",
+                        ],
+                        ["46", "Zasilanie do kamer", "3x2.5 mm²", "1", "230V", "L2"],
+                        ["47", "Sauna", "5x4 mm²", "7", "400V", "L1+L2+L3"],
+                        ["48", "Rolety", "3x1.5 mm²", "1", "230V", "L3"],
+                    ];
+
+                    // Clear existing data
+                    const tableBody =
+                        document.getElementById("obwodyTable").getElementsByTagName(
+                            "tbody",
+                        )[0];
+                    tableBody.innerHTML = "";
+                    rowIndex = 1;
+                    originalRows = [];
+
+                    // Add sample data
+                    sampleData.forEach((rowData) => {
+                        const row = tableBody.insertRow();
+                        row.innerHTML = `
+                        <td class="narrow">${rowData[0]}</td>
+                        <td class="wide"><input list="nazwa_obwodu_list" name="nazwa_obwodu" value="${
+                            rowData[1]
+                        }"></td>
+                        <td class="medium">
+                            <select name="przewód">
+                                <option value="${rowData[2]}" selected>${
+                            rowData[2]
+                        }</option>
+                                <option value="3x2.5 mm²">3x2.5 mm²</option>
+                                <option value="3x1.5 mm²">3x1.5 mm²</option>
+                                <option value="4x1.5 mm²">4x1.5 mm²</option>
+                                <option value="5x1.5 mm²">5x1.5 mm²</option>
+                                <option value="5x2.5 mm²">5x2.5 mm²</option>
+                                <option value="5x4 mm²">5x4 mm²</option>
+                                <option value="5x6 mm²">5x6 mm²</option>
+                            </select>
+                        </td>
+                        <td class="moc"><input type="number" name="moc" min="0" value="${
+                            rowData[3]
+                        }"></td>
+                        <td class="small">
+                            <select name="napiecie">
+                                <option value="${rowData[4]}" selected>${
+                            rowData[4]
+                        }</option>
+                                <option value="230V">230V</option>
+                                <option value="400V">400V</option>
+                            </select>
+                        </td>
+                        <td class="small">
+                            <select name="faza">
+                                <option value="${rowData[5]}" selected>${
+                            rowData[5]
+                        }</option>
+                                <option value="L1">L1</option>
+                                <option value="L2">L2</option>
+                                <option value="L3">L3</option>
+                                <option value="L1+L2+L3">L1+L2+L3</option>
+                            </select>
+                        </td>
+                        <td class="small"><span class="delete-btn" onclick="deleteRow(this)">X</span></td>
+                    `;
+                        rowIndex++;
+                    });
+
+                    // Update everything
+                    addInputListeners();
+                    saveOriginalRows();
+                    updateChart();
+                    updateSummary();
+                    ensureOneEmptyRow();
+                }
+            }
+
+            // Add these new functions after the existing ones
+            function saveToCSV() {
+                const table = document.getElementById("obwodyTable").getElementsByTagName("tbody")[0];
+                const rows = Array.from(table.getElementsByTagName("tr"));
+                
+                // Create CSV content
+                let csvContent = "Nr Obwodu,Nazwa Obwodu,Przewód,Moc kW,Napięcie,Faza\n";
+                
+                rows.forEach((row) => {
+                    const cells = row.getElementsByTagName("td");
+                    const rowData = [
+                        cells[0].innerText,
+                        cells[1].querySelector("input").value,
+                        cells[2].querySelector("select").value,
+                        cells[3].querySelector("input").value,
+                        cells[4].querySelector("select").value,
+                        cells[5].querySelector("select").value
+                    ];
+                    
+                    // Handle possible commas in the data by wrapping in quotes if needed
+                    const processedData = rowData.map(field => {
+                        if (field.includes(',')) {
+                            return `"${field}"`;
+                        }
+                        return field;
+                    });
+                    
+                    csvContent += processedData.join(',') + '\n';
+                });
+
+                // Create blob and download
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "data.csv";
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            function loadFromCSV() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.csv';
+                
+                input.onchange = function(e) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const csvData = event.target.result;
+                        const lines = csvData.split('\n');
+                        
+                        // Skip header row
+                        lines.shift();
+                        
+                        // Clear existing table data
+                        const table = document.getElementById("obwodyTable").getElementsByTagName("tbody")[0];
+                        table.innerHTML = '';
+                        rowIndex = 1;
+                        
+                        // Process each line
+                        lines.forEach((line) => {
+                            if (line.trim() === '') return; // Skip empty lines
+                            
+                            // Handle quoted values containing commas
+                            const values = [];
+                            let inQuotes = false;
+                            let currentValue = '';
+                            
+                            for (let char of line) {
+                                if (char === '"') {
+                                    inQuotes = !inQuotes;
+                                } else if (char === ',' && !inQuotes) {
+                                    values.push(currentValue);
+                                    currentValue = '';
+                                } else {
+                                    currentValue += char;
+                                }
+                            }
+                            values.push(currentValue); // Add the last value
+                            
+                            // Create new row with the data
+                            const row = table.insertRow();
+                            row.innerHTML = `
+                                <td class="narrow">${rowIndex}</td>
+                                <td class="wide">
+                                    <input list="nazwa_obwodu_list" name="nazwa_obwodu" value="${values[1]}">
+                                </td>
+                                <td class="medium">
+                                    <select name="przewód">
+                                        <option value="">Wybierz</option>
+                                        <option value="3x2.5 mm²" ${values[2] === "3x2.5 mm²" ? "selected" : ""}>3x2.5 mm²</option>
+                                        <option value="3x1.5 mm²" ${values[2] === "3x1.5 mm²" ? "selected" : ""}>3x1.5 mm²</option>
+                                        <option value="4x1.5 mm²" ${values[2] === "4x1.5 mm²" ? "selected" : ""}>4x1.5 mm²</option>
+                                        <option value="5x1.5 mm²" ${values[2] === "5x1.5 mm²" ? "selected" : ""}>5x1.5 mm²</option>
+                                        <option value="5x2.5 mm²" ${values[2] === "5x2.5 mm²" ? "selected" : ""}>5x2.5 mm²</option>
+                                        <option value="5x4 mm²" ${values[2] === "5x4 mm²" ? "selected" : ""}>5x4 mm²</option>
+                                        <option value="5x6 mm²" ${values[2] === "5x6 mm²" ? "selected" : ""}>5x6 mm²</option>
+                                    </select>
+                                </td>
+                                <td class="moc"><input type="number" name="moc" min="0" value="${values[3]}" /></td>
+                                <td class="small">
+                                    <select name="napiecie">
+                                        <option value="">Wybierz</option>
+                                        <option value="230V" ${values[4] === "230V" ? "selected" : ""}>230V</option>
+                                        <option value="400V" ${values[4] === "400V" ? "selected" : ""}>400V</option>
+                                    </select>
+                                </td>
+                                <td class="small">
+                                    <select name="faza">
+                                        <option value="">Wybierz</option>
+                                        <option value="L1" ${values[5] === "L1" ? "selected" : ""}>L1</option>
+                                        <option value="L2" ${values[5] === "L2" ? "selected" : ""}>L2</option>
+                                        <option value="L3" ${values[5] === "L3" ? "selected" : ""}>L3</option>
+                                        <option value="L1+L2+L3" ${values[5] === "L1+L2+L3" ? "selected" : ""}>L1+L2+L3</option>
+                                    </select>
+                                </td>
+                                <td class="small"><span class="delete-btn" onclick="deleteRow(this)">X</span></td>
+                            `;
+                            rowIndex++;
+                            
+                            // Add event listeners to the new row
+                            const inputs = row.querySelectorAll("input, select");
+                            inputs.forEach((input) => {
+                                input.addEventListener("input", handleInputChange);
+                            });
+                        });
+                        
+                        // Update everything
+                        saveOriginalRows();
+                        updateChart();
+                        updateSummary();
+                        ensureOneEmptyRow();
+                    };
+                    
+                    reader.readAsText(file);
+                };
+                
+                input.click();
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const ctx = document.getElementById("myChart").getContext("2d");
+                chart = new Chart(ctx, {
+                    type: "pie",
+                    data: {
+                        labels: ["L1", "L2", "L3"],
+                        datasets: [{
+                            label: "Moc w fazach",
+                            data: [0, 0, 0], // Initial data
+                            backgroundColor: ["red", "green", "blue"],
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // Ensure the chart size is controlled via CSS
+                        plugins: {
+                            legend: {
+                                position: "top",
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const label = context.label || "";
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce(
+                                            (acc, val) => acc + val,
+                                            0,
+                                        );
+                                        const percentage = total
+                                            ? ((value / total) * 100).toFixed(2)
+                                            : 0;
+                                        return `${label}: ${value} (${percentage}%)`;
+                                    },
+                                },
+                            },
+                        },
+                    },
+                });
+
+                loadDataFromLocalStorage();
+
+                // Update chart and summary after data is loaded
+                updateChart();
+                updateSummary();
+            });
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="table-container">
+                <table id="obwodyTable">
+                    <thead>
+                        <tr>
+                            <th class="narrow">Nr Obwodu</th>
+                            <th class="wide">Nazwa Obwodu</th>
+                            <th class="medium">Przewód</th>
+                            <th class="moc">Moc kW</th>
+                            <th class="small">Napięcie</th>
+                            <th class="small">Faza</th>
+                            <th class="small">Usuń</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="button-container">
+                    <button class="filter-btn" onclick="filterTable('L1')">
+                        Filtruj L1
+                    </button>
+                    <button class="filter-btn" onclick="filterTable('L2')">
+                        Filtruj L2
+                    </button>
+                    <button class="filter-btn" onclick="filterTable('L3')">
+                        Filtruj L3
+                    </button>
+                    <button
+                        class="filter-btn"
+                        onclick="filterTable('L1+L2+L3')"
+                    >
+                        Filtruj L1+L2+L3
+                    </button>
+                    <button class="filter-btn" onclick="restoreOriginalRows()">
+                        Pokaż Wszystkie
+                    </button>
+                    <button
+                        class="filter-btn"
+                        onclick="sortTableByPhase()"
+                        id="sortButton"
+                    >
+                        Sortuj według faz
+                    </button>
+                </div>
+                <div class="button-container">
+                    <button
+                        class="wide-buttons"
+                        id="generatePdfBtn"
+                        onclick="generatePDF()"
+                    >
+                        Generuj PDF
+                    </button>
+                    <button
+                        class="wide-buttons"
+                        id="generateOpisBtn"
+                        onclick="generateOpisPDF()"
+                    >
+                        Generuj opis rozdzielnicy
+                    </button>
+                    <button
+                        class="wide-buttons"
+                        id="clearDataBtn"
+                        onclick="clearData()"
+                    >
+                        Wyczyść dane
+                    </button>
+                    <button
+                        class="wide-buttons"
+                        id="generateSampleBtn"
+                        onclick="generateSampleData()"
+                    >
+                        Generuj przykładowe dane
+                    </button>
+                    <button
+                        class="wide-buttons"
+                        id="saveCSVBtn"
+                        onclick="saveToCSV()"
+                    >
+                        Zapisz dane do pliku
+                    </button>
+                    <button
+                        class="wide-buttons"
+                        id="loadCSVBtn"
+                        onclick="loadFromCSV()"
+                    >
+                        Wczytaj dane z pliku
+                    </button>
+                </div>
+            </div>
+            <div id="chartContainer">
+                <div class="summary-box">
+                    <strong>Moc do zgłoszenia: <span id="reportedPower"
+                        >0 kW</span></strong>
+                </div>
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </body>
+</html>
