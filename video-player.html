@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Odtwarzacz wideo MP4 online</title>
+<style>
+    :root {
+        --bg: #101114;
+        --panel: #191b20;
+        --panel-2: #22252c;
+        --accent: #6ea8fe;
+        --text: #e8e9ec;
+        --text-dim: #9a9ea7;
+        --border: #2c2f37;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: system-ui, "Segoe UI", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 12px 60px;
+    }
+    h1 {
+        font-size: 22px;
+        margin: 0 0 16px;
+        text-align: center;
+    }
+    .layout {
+        width: 100%;
+        max-width: 1100px;
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+    .main {
+        flex: 2;
+        min-width: 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+    .side {
+        flex: 1;
+        min-width: 260px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 640px;
+    }
+    .dropzone {
+        border: 2px dashed var(--border);
+        border-radius: 10px;
+        background: var(--panel);
+        aspect-ratio: 16 / 9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: var(--text-dim);
+        cursor: pointer;
+        transition: border-color .15s, background .15s;
+        position: relative;
+        overflow: hidden;
+    }
+    .dropzone.drag-over {
+        border-color: var(--accent);
+        background: var(--panel-2);
+    }
+    .dropzone p { margin: 4px 0; }
+    .dropzone small { color: var(--text-dim); }
+    video {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: #000;
+        border-radius: 10px;
+        display: none;
+    }
+    .player-wrap.has-video video { display: block; }
+    .player-wrap.has-video .dropzone { display: none; }
+
+    .controls {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .progress-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-variant-numeric: tabular-nums;
+        font-size: 13px;
+        color: var(--text-dim);
+    }
+    input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        flex: 1;
+        height: 5px;
+        border-radius: 3px;
+        background: var(--panel-2);
+        outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--accent);
+        cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        border: none;
+        border-radius: 50%;
+        background: var(--accent);
+        cursor: pointer;
+    }
+    .btn-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    button, select {
+        background: var(--panel-2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 7px 12px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    button:hover { border-color: var(--accent); }
+    button.icon {
+        width: 38px;
+        padding: 7px 0;
+        text-align: center;
+    }
+    .volume-row { display: flex; align-items: center; gap: 6px; width: 130px; }
+    .spacer { flex: 1; }
+
+    .url-form {
+        display: flex;
+        gap: 8px;
+    }
+    .url-form input[type="text"] {
+        flex: 1;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 6px;
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .side h2 {
+        font-size: 15px;
+        margin: 0 0 4px;
+    }
+    #playlist {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    #playlist li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 6px;
+        background: var(--panel-2);
+        cursor: pointer;
+        font-size: 13px;
+    }
+    #playlist li.active {
+        outline: 1px solid var(--accent);
+        color: var(--accent);
+    }
+    #playlist li .name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    #playlist li .remove {
+        color: #e0777d;
+        font-weight: bold;
+        padding: 0 4px;
+    }
+    #playlist:empty::after {
+        content: "Playlista jest pusta";
+        color: var(--text-dim);
+        font-size: 13px;
+    }
+    .hint {
+        color: var(--text-dim);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+    input[type="file"] { display: none; }
+</style>
+</head>
+<body>
+    <h1>Odtwarzacz wideo MP4 online</h1>
+    <div class="layout">
+        <div class="main">
+            <div class="player-wrap" id="playerWrap">
+                <div class="dropzone" id="dropzone">
+                    <div>
+                        <p><strong>Przeciągnij i upuść plik MP4</strong></p>
+                        <p>lub kliknij, aby wybrać z dysku</p>
+                        <small>albo wklej adres URL wideo poniżej</small>
+                    </div>
+                </div>
+                <video id="video" controls playsinline></video>
+            </div>
+            <input type="file" id="fileInput" accept="video/mp4,video/*" multiple />
+
+            <div class="url-form">
+                <input type="text" id="urlInput" placeholder="Wklej adres URL do pliku .mp4..." />
+                <button id="loadUrlBtn">Wczytaj</button>
+            </div>
+
+            <div class="controls">
+                <div class="progress-row">
+                    <span id="timeCurrent">00:00</span>
+                    <input type="range" id="seekBar" min="0" max="100" value="0" step="0.1" />
+                    <span id="timeDuration">00:00</span>
+                </div>
+                <div class="btn-row">
+                    <button class="icon" id="playPauseBtn" title="Odtwórz/Pauza (Spacja)">▶</button>
+                    <button class="icon" id="prevBtn" title="Poprzedni">⏮</button>
+                    <button class="icon" id="nextBtn" title="Następny">⏭</button>
+                    <div class="volume-row">
+                        <button class="icon" id="muteBtn" title="Wycisz (M)">🔊</button>
+                        <input type="range" id="volumeBar" min="0" max="1" step="0.01" value="1" />
+                    </div>
+                    <select id="speedSelect" title="Prędkość odtwarzania">
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2x</option>
+                    </select>
+                    <span class="spacer"></span>
+                    <button class="icon" id="fullscreenBtn" title="Pełny ekran (F)">⛶</button>
+                </div>
+            </div>
+            <p class="hint">
+                Skróty klawiszowe: Spacja/K – odtwórz/pauza, ←/→ – przewiń 5s,
+                ↑/↓ – głośność, M – wycisz, F – pełny ekran.
+            </p>
+        </div>
+
+        <div class="side">
+            <h2>Playlista</h2>
+            <ul id="playlist"></ul>
+        </div>
+    </div>
+
+<script>
+(() => {
+    const video = document.getElementById("video");
+    const playerWrap = document.getElementById("playerWrap");
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("fileInput");
+    const urlInput = document.getElementById("urlInput");
+    const loadUrlBtn = document.getElementById("loadUrlBtn");
+    const seekBar = document.getElementById("seekBar");
+    const timeCurrent = document.getElementById("timeCurrent");
+    const timeDuration = document.getElementById("timeDuration");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const muteBtn = document.getElementById("muteBtn");
+    const volumeBar = document.getElementById("volumeBar");
+    const speedSelect = document.getElementById("speedSelect");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const playlistEl = document.getElementById("playlist");
+
+    let playlist = [];
+    let currentIndex = -1;
+    let isSeeking = false;
+
+    function formatTime(sec) {
+        if (!isFinite(sec) || sec < 0) sec = 0;
+        const m = Math.floor(sec / 60).toString().padStart(2, "0");
+        const s = Math.floor(sec % 60).toString().padStart(2, "0");
+        return `${m}:${s}`;
+    }
+
+    function renderPlaylist() {
+        playlistEl.innerHTML = "";
+        playlist.forEach((item, i) => {
+            const li = document.createElement("li");
+            li.className = i === currentIndex ? "active" : "";
+            li.innerHTML = `<span class="name">${item.name}</span><span class="remove" title="Usuń">✕</span>`;
+            li.querySelector(".name").addEventListener("click", () => playIndex(i));
+            li.querySelector(".remove").addEventListener("click", (e) => {
+                e.stopPropagation();
+                removeFromPlaylist(i);
+            });
+            playlistEl.appendChild(li);
+        });
+    }
+
+    function addToPlaylist(name, src, revoke) {
+        playlist.push({ name, src, revoke });
+        renderPlaylist();
+        return playlist.length - 1;
+    }
+
+    function removeFromPlaylist(i) {
+        const item = playlist[i];
+        if (item.revoke) URL.revokeObjectURL(item.src);
+        playlist.splice(i, 1);
+        if (i === currentIndex) {
+            playerWrap.classList.remove("has-video");
+            video.removeAttribute("src");
+            currentIndex = -1;
+        } else if (i < currentIndex) {
+            currentIndex--;
+        }
+        renderPlaylist();
+    }
+
+    function playIndex(i) {
+        if (i < 0 || i >= playlist.length) return;
+        currentIndex = i;
+        video.src = playlist[i].src;
+        playerWrap.classList.add("has-video");
+        video.play().catch(() => {});
+        renderPlaylist();
+    }
+
+    function loadFiles(files) {
+        let firstNewIndex = -1;
+        Array.from(files).forEach((file) => {
+            const src = URL.createObjectURL(file);
+            const idx = addToPlaylist(file.name, src, true);
+            if (firstNewIndex === -1) firstNewIndex = idx;
+        });
+        if (firstNewIndex !== -1) playIndex(firstNewIndex);
+    }
+
+    function loadUrl(url) {
+        if (!url) return;
+        let name;
+        try {
+            name = decodeURIComponent(new URL(url).pathname.split("/").pop()) || url;
+        } catch {
+            name = url;
+        }
+        const idx = addToPlaylist(name, url, false);
+        playIndex(idx);
+    }
+
+    dropzone.addEventListener("click", () => fileInput.click());
+    dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.classList.add("drag-over");
+    });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("drag-over"));
+    dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("drag-over");
+        if (e.dataTransfer.files.length) loadFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length) loadFiles(e.target.files);
+        fileInput.value = "";
+    });
+
+    loadUrlBtn.addEventListener("click", () => {
+        loadUrl(urlInput.value.trim());
+        urlInput.value = "";
+    });
+    urlInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") loadUrlBtn.click();
+    });
+
+    playPauseBtn.addEventListener("click", () => {
+        if (video.paused) video.play(); else video.pause();
+    });
+    video.addEventListener("play", () => playPauseBtn.textContent = "⏸");
+    video.addEventListener("pause", () => playPauseBtn.textContent = "▶");
+
+    video.addEventListener("loadedmetadata", () => {
+        seekBar.max = video.duration || 0;
+        timeDuration.textContent = formatTime(video.duration);
+    });
+    video.addEventListener("timeupdate", () => {
+        if (!isSeeking) {
+            seekBar.value = video.currentTime;
+            timeCurrent.textContent = formatTime(video.currentTime);
+        }
+    });
+    seekBar.addEventListener("input", () => {
+        isSeeking = true;
+        timeCurrent.textContent = formatTime(seekBar.value);
+    });
+    seekBar.addEventListener("change", () => {
+        video.currentTime = parseFloat(seekBar.value);
+        isSeeking = false;
+    });
+
+    volumeBar.addEventListener("input", () => {
+        video.volume = parseFloat(volumeBar.value);
+        video.muted = video.volume === 0;
+        muteBtn.textContent = video.muted ? "🔇" : "🔊";
+    });
+    muteBtn.addEventListener("click", () => {
+        video.muted = !video.muted;
+        muteBtn.textContent = video.muted ? "🔇" : "🔊";
+    });
+
+    speedSelect.addEventListener("change", () => {
+        video.playbackRate = parseFloat(speedSelect.value);
+    });
+
+    fullscreenBtn.addEventListener("click", () => {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            playerWrap.requestFullscreen().catch(() => {});
+        }
+    });
+
+    function playRelative(offset) {
+        if (!playlist.length) return;
+        let i = currentIndex + offset;
+        if (i < 0) i = playlist.length - 1;
+        if (i >= playlist.length) i = 0;
+        playIndex(i);
+    }
+    prevBtn.addEventListener("click", () => playRelative(-1));
+    nextBtn.addEventListener("click", () => playRelative(1));
+    video.addEventListener("ended", () => playRelative(1));
+
+    document.addEventListener("keydown", (e) => {
+        if (["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+        switch (e.key.toLowerCase()) {
+            case " ":
+            case "k":
+                e.preventDefault();
+                playPauseBtn.click();
+                break;
+            case "arrowright":
+                video.currentTime = Math.min(video.duration || 0, video.currentTime + 5);
+                break;
+            case "arrowleft":
+                video.currentTime = Math.max(0, video.currentTime - 5);
+                break;
+            case "arrowup":
+                e.preventDefault();
+                video.volume = Math.min(1, video.volume + 0.05);
+                volumeBar.value = video.volume;
+                break;
+            case "arrowdown":
+                e.preventDefault();
+                video.volume = Math.max(0, video.volume - 0.05);
+                volumeBar.value = video.volume;
+                break;
+            case "m":
+                muteBtn.click();
+                break;
+            case "f":
+                fullscreenBtn.click();
+                break;
+        }
+    });
+})();
+</script>
+</body>
+</html>
