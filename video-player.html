@@ -218,6 +218,32 @@
         line-height: 1.5;
     }
     input[type="file"] { display: none; }
+
+    .error-box {
+        display: none;
+        background: #3a2020;
+        border: 1px solid #a14747;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    .error-box.visible { display: block; }
+    .error-box strong { color: #ff9d9d; }
+
+    .codec-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+    .codec-table th, .codec-table td {
+        text-align: left;
+        padding: 5px 6px;
+        border-bottom: 1px solid var(--border);
+    }
+    .codec-status.ok { color: #7bd88f; }
+    .codec-status.maybe { color: #e0c777; }
+    .codec-status.no { color: #e0777d; }
 </style>
 </head>
 <body>
@@ -234,6 +260,7 @@
                 </div>
                 <video id="video" controls playsinline></video>
             </div>
+            <div class="error-box" id="errorBox"></div>
             <input type="file" id="fileInput" accept="video/mp4,video/*" multiple />
 
             <div class="url-form">
@@ -276,6 +303,19 @@
         <div class="side">
             <h2>Playlista</h2>
             <ul id="playlist"></ul>
+            <h2>Obsługa kodeków w tej przeglądarce</h2>
+            <table class="codec-table" id="codecTable">
+                <thead>
+                    <tr><th>Kodek wideo</th><th>Audio</th><th>Wsparcie</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <p class="hint">
+                Plik MP4 to tylko kontener — to, czy obraz i dźwięk odtworzą się
+                poprawnie, zależy od kodeków w środku. H.264 + AAC działają
+                praktycznie wszędzie. HEVC/H.265 i AC3 często nie są obsługiwane
+                w Chrome/Firefox na komputerze.
+            </p>
         </div>
     </div>
 
@@ -298,6 +338,8 @@
     const speedSelect = document.getElementById("speedSelect");
     const fullscreenBtn = document.getElementById("fullscreenBtn");
     const playlistEl = document.getElementById("playlist");
+    const errorBox = document.getElementById("errorBox");
+    const codecTableBody = document.querySelector("#codecTable tbody");
 
     let playlist = [];
     let currentIndex = -1;
@@ -308,6 +350,70 @@
         const m = Math.floor(sec / 60).toString().padStart(2, "0");
         const s = Math.floor(sec % 60).toString().padStart(2, "0");
         return `${m}:${s}`;
+    }
+
+    const CODEC_CHECKS = [
+        { label: "H.264 (AVC)", audio: "AAC", mime: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"' },
+        { label: "H.265 (HEVC)", audio: "AAC", mime: 'video/mp4; codecs="hvc1.1.6.L93.90, mp4a.40.2"' },
+        { label: "VP9", audio: "Opus", mime: 'video/webm; codecs="vp09.00.10.08, opus"' },
+        { label: "AV1", audio: "Opus", mime: 'video/mp4; codecs="av01.0.05M.08"' },
+        { label: "MPEG-4 (DivX/Xvid)", audio: "MP3", mime: 'video/mp4; codecs="mp4v.20.8, mp4a.40.34"' },
+    ];
+
+    function statusLabel(result) {
+        if (result === "probably") return { text: "Tak", cls: "ok" };
+        if (result === "maybe") return { text: "Prawdopodobnie", cls: "maybe" };
+        return { text: "Nie", cls: "no" };
+    }
+
+    function renderCodecSupport() {
+        const probe = document.createElement("video");
+        codecTableBody.innerHTML = "";
+        CODEC_CHECKS.forEach((check) => {
+            const result = probe.canPlayType(check.mime);
+            const status = statusLabel(result);
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${check.label}</td><td>${check.audio}</td><td class="codec-status ${status.cls}">${status.text}</td>`;
+            codecTableBody.appendChild(tr);
+        });
+    }
+
+    function showError(message) {
+        errorBox.innerHTML = message;
+        errorBox.classList.add("visible");
+    }
+
+    function clearError() {
+        errorBox.classList.remove("visible");
+        errorBox.innerHTML = "";
+    }
+
+    function handleVideoError() {
+        const err = video.error;
+        if (!err) return;
+        const name = playlist[currentIndex] ? playlist[currentIndex].name : "plik";
+        let message;
+        switch (err.code) {
+            case err.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                message = `<strong>Nie można odtworzyć „${name}”.</strong> Ta przeglądarka nie
+                    obsługuje formatu lub kodeka użytego w tym pliku (np. HEVC/H.265, AC3 lub
+                    inny kontener niż MP4/WebM). Spróbuj otworzyć plik w VLC albo przekonwertuj
+                    go do H.264 (wideo) + AAC (audio).`;
+                break;
+            case err.MEDIA_ERR_DECODE:
+                message = `<strong>Błąd dekodowania „${name}”.</strong> Plik zaczął się wczytywać,
+                    ale kodek lub uszkodzone dane uniemożliwiły dalsze odtwarzanie. Sprawdź
+                    obsługę kodeków poniżej lub przekonwertuj plik.`;
+                break;
+            case err.MEDIA_ERR_NETWORK:
+                message = `<strong>Błąd sieci przy wczytywaniu „${name}”.</strong> Sprawdź adres
+                    URL i połączenie internetowe.`;
+                break;
+            default:
+                message = `<strong>Nie udało się odtworzyć „${name}”.</strong> Spróbuj innego pliku
+                    lub sprawdź obsługę kodeków poniżej.`;
+        }
+        showError(message);
     }
 
     function renderPlaylist() {
@@ -347,6 +453,7 @@
 
     function playIndex(i) {
         if (i < 0 || i >= playlist.length) return;
+        clearError();
         currentIndex = i;
         video.src = playlist[i].src;
         playerWrap.classList.add("has-video");
@@ -405,6 +512,9 @@
     });
     video.addEventListener("play", () => playPauseBtn.textContent = "⏸");
     video.addEventListener("pause", () => playPauseBtn.textContent = "▶");
+    video.addEventListener("error", handleVideoError);
+
+    renderCodecSupport();
 
     video.addEventListener("loadedmetadata", () => {
         seekBar.max = video.duration || 0;
