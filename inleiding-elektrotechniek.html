@@ -180,7 +180,9 @@
             <h4>Stroom, energie en vermogen</h4>
             <div class="toc">
                 <a href="#coulomb">1.8 Elektrische stroom (Coulomb)</a>
+                <a href="#wet-van-ohm">Wet van Ohm</a>
                 <a href="#formuleoverzicht">Formuleoverzicht</a>
+                <a href="#herkomst-eenheden">Herkomst van de eenheden</a>
                 <a href="#omzetten-energie">1.20 Omzetten van energie</a>
             </div>
         </div>
@@ -392,6 +394,27 @@
         </p>
     </section>
 
+    <section id="wet-van-ohm">
+        <h3>Wet van Ohm</h3>
+        <p>
+            De <strong>wet van Ohm</strong> beschrijft het verband tussen spanning (U), stroom (I) en weerstand
+            (R). De vermogenswet koppelt daar vermogen (P) aan vast. Samen vormen ze een "wiel": ken je twee van
+            de vier grootheden U, I, R en P, dan kun je de andere twee altijd berekenen.
+        </p>
+        <div class="formula">U = I &times; R &nbsp;&nbsp;&nbsp;&nbsp; P = U &times; I</div>
+        <table>
+            <tr><th>Bereken U</th><th>Bereken I</th><th>Bereken R</th><th>Bereken P</th></tr>
+            <tr><td>U = I &times; R</td><td>I = U / R</td><td>R = U / I</td><td>P = U &times; I</td></tr>
+            <tr><td>U = P / I</td><td>I = P / U</td><td>R = U&sup2; / P</td><td>P = U&sup2; / R</td></tr>
+            <tr><td>U = &radic;(P &times; R)</td><td>I = &radic;(P / R)</td><td>R = P / I&sup2;</td><td>P = I&sup2; &times; R</td></tr>
+        </table>
+        <p class="note">
+            Volt (spanning) staat voor U, Ohm (weerstand) voor R en Ampère (stroom) voor I. Deze tabel is een
+            geheugensteun: zoek de kolom van de grootheid die je zoekt, en gebruik de rij met de twee grootheden
+            die je al kent.
+        </p>
+    </section>
+
     <section id="formuleoverzicht">
         <h3>Formuleoverzicht</h3>
         <table>
@@ -417,6 +440,50 @@
             &eta; (rendement) is de verhouding tussen afgegeven (a) en toegevoerde (t) energie of vermogen &mdash;
             altijd een waarde tussen 0 en 1 (of 0&ndash;100%). T<sub>as</sub> is het koppel op een draaiende as,
             berekend uit het afgegeven vermogen P<sub>a</sub> en het toerental n.
+        </p>
+    </section>
+
+    <section id="herkomst-eenheden">
+        <h3>Herkomst van de eenheden</h3>
+        <p>Elke elektrische eenheid is genoemd naar een natuurkundige die eraan bijdroeg:</p>
+        <table>
+            <tr><th>Begrip</th><th>Symbool</th><th>Eenheid</th><th>Herkomst</th></tr>
+            <tr>
+                <td>Elektrische lading</td><td>Q</td><td>coulomb (C)</td>
+                <td>Genoemd naar Charles-Augustin de Coulomb. Q komt van het Engelse <em>quantity</em>
+                    (hoeveelheid lading).</td>
+            </tr>
+            <tr>
+                <td>Stroomsterkte</td><td>I</td><td>ampère (A)</td>
+                <td>Genoemd naar André-Marie Ampère. I komt van het Franse <em>intensité</em> (sterkte).</td>
+            </tr>
+            <tr>
+                <td>Spanning</td><td>U</td><td>volt (V)</td>
+                <td>Genoemd naar Alessandro Volta. U komt van het Duitse <em>Unterschied</em> (verschil in
+                    spanning).</td>
+            </tr>
+            <tr>
+                <td>Weerstand</td><td>R</td><td>ohm (&Omega;)</td>
+                <td>De Griekse hoofdletter omega (&Omega;) geeft de eenheid weerstand aan. In formules gebruiken
+                    we de letter R, van het Engelse <em>resistance</em> (weerstand).</td>
+            </tr>
+            <tr>
+                <td>Arbeid</td><td>W</td><td>joule (J)</td>
+                <td>Genoemd naar James Prescott Joule. W komt van het Engelse <em>work</em> (arbeid).</td>
+            </tr>
+            <tr>
+                <td>Vermogen</td><td>P</td><td>watt (W)</td>
+                <td>Genoemd naar James Watt. P komt van het Engelse <em>power</em> (vermogen).</td>
+            </tr>
+        </table>
+        <p class="note">
+            Kort samengevat: lading (Q) geeft aan hoeveel elektrische deeltjes zijn verplaatst &mdash; de basis
+            van alle stroom. Stroomsterkte (I) is hoeveel lading er per seconde door een geleider stroomt.
+            Spanning (U) is het verschil in lading tussen twee punten en zorgt dat stroom gaat lopen, net als
+            waterdruk in een leiding. Weerstand (R) geeft aan hoe moeilijk stroom door een materiaal komt: hoe
+            hoger de weerstand, hoe minder stroom er doorheen kan. Arbeid (W) is de totale hoeveelheid energie
+            die wordt omgezet (bijvoorbeeld in warmte, beweging of licht), en vermogen (P) is hoeveel energie
+            een apparaat elke seconde gebruikt of levert.
         </p>
     </section>
 
