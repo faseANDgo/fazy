@@ -61,6 +61,14 @@
         margin: 0 auto;
         padding: 0 16px;
     }
+    h2.topic {
+        max-width: 900px;
+        margin: 36px auto 0;
+        padding: 0 16px;
+        font-size: 24px;
+        color: var(--text);
+    }
+    h2.topic:first-of-type { margin-top: 24px; }
     section {
         background: var(--panel);
         border: 1px solid var(--border);
@@ -68,14 +76,10 @@
         padding: 20px 24px;
         margin-top: 20px;
     }
-    section h2 {
-        margin-top: 0;
-        font-size: 20px;
-        color: var(--accent);
-    }
     section h3 {
-        font-size: 16px;
-        margin-bottom: 4px;
+        margin-top: 0;
+        font-size: 18px;
+        color: var(--accent);
     }
     .figref {
         display: inline-block;
@@ -129,33 +133,55 @@
         gap: 8px 16px;
         font-size: 14px;
     }
+    .toc-group { margin-top: 8px; }
+    .toc-group h4 {
+        margin: 12px 0 4px;
+        font-size: 13px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
     .toc a { color: var(--accent); text-decoration: none; }
     .toc a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 <header>
-    <p class="kicker">1,1 Inleiding in de elektrotechniek</p>
-    <h1>Spanning</h1>
-    <p>Hoe elektrische spanning kan ontstaan</p>
+    <p class="kicker">Hoofdstuk 1</p>
+    <h1>1.1 Inleiding in de elektrotechniek</h1>
+    <p>Basisbegrippen: spanning en elektrische lading</p>
     <nav class="top"><a href="index.html">&larr; Terug naar de obwodentabel</a></nav>
 </header>
 
 <main>
     <section id="inhoud">
-        <h2>Inhoud</h2>
-        <div class="toc">
-            <a href="#wat-is-spanning">Wat is spanning?</a>
-            <a href="#inductie">1.2 Inductiespanning</a>
-            <a href="#chemisch">1.3 Spanning door scheikundige werking</a>
-            <a href="#thermokoppel">1.4 Thermokoppel</a>
-            <a href="#zonnepaneel">1.6 Opbouw zonnepaneel</a>
-            <a href="#piezo">1.8 Piëzo-element</a>
+        <h3>Inhoud</h3>
+        <div class="toc-group">
+            <h4>Spanning</h4>
+            <div class="toc">
+                <a href="#wat-is-spanning">Wat is spanning?</a>
+                <a href="#inductie">1.2 Inductiespanning</a>
+                <a href="#chemisch">1.3 Spanning door scheikundige werking</a>
+                <a href="#thermokoppel">1.4 Thermokoppel</a>
+                <a href="#zonnepaneel">1.6 Opbouw zonnepaneel</a>
+                <a href="#piezo">1.8 Piëzo-element</a>
+            </div>
+        </div>
+        <div class="toc-group">
+            <h4>Elektrische lading</h4>
+            <div class="toc">
+                <a href="#atoommodel">1.11 Atoommodel</a>
+                <a href="#deeltjes">1.12 Deeltjes met hun lading</a>
+                <a href="#stroomkring">1.14 Uitvergroting stroomkring</a>
+            </div>
         </div>
     </section>
+</main>
 
+<h2 class="topic">Spanning</h2>
+<main>
     <section id="wat-is-spanning">
-        <h2>Wat is spanning?</h2>
+        <h3>Wat is spanning?</h3>
         <p>
             Elektrische <strong>spanning</strong> (symbool <em>U</em>, eenheid Volt, V) is het verschil in
             elektrisch potentiaal tussen twee punten. Dat verschil is nodig om lading in beweging te krijgen,
@@ -164,81 +190,86 @@
         </p>
     </section>
 
-    <section id="inductie" class="methode">
-        <h2 id="inductie-h">1.2 Inductiespanning</h2>
-        <span class="figref">Figuur 1.2 &middot; Inductiespanning</span>
-        <p>
-            Beweeg je een magneet (met noordpool N en zuidpool S) langs een spoel, dan verandert het magnetisch
-            veld door de spoel. Die verandering wekt een spanning op in de spoel &mdash; dit heet
-            <strong>elektromagnetische inductie</strong>. Een voltmeter, aangesloten op de uiteinden van de spoel,
-            toont de opgewekte spanning.
-        </p>
-        <p class="note">
-            Dit principe is de basis van generatoren en dynamo's: elke keer dat een geleider en een magnetisch
-            veld ten opzichte van elkaar bewegen, ontstaat er een inductiespanning.
-        </p>
+    <section>
+        <div class="methode" id="inductie">
+            <h3>1.2 Inductiespanning</h3>
+            <span class="figref">Figuur 1.2 &middot; Inductiespanning</span>
+            <p>
+                Beweeg je een magneet (met noordpool N en zuidpool S) langs een spoel, dan verandert het
+                magnetisch veld door de spoel. Die verandering wekt een spanning op in de spoel &mdash; dit heet
+                <strong>elektromagnetische inductie</strong>. Een voltmeter, aangesloten op de uiteinden van de
+                spoel, toont de opgewekte spanning.
+            </p>
+            <p class="note">
+                Dit principe is de basis van generatoren en dynamo's: elke keer dat een geleider en een
+                magnetisch veld ten opzichte van elkaar bewegen, ontstaat er een inductiespanning.
+            </p>
+        </div>
+
+        <div class="methode" id="chemisch">
+            <h3>1.3 Spanning door scheikundige werking</h3>
+            <span class="figref">Figuur 1.3 &middot; Spanning door scheikundige werking</span>
+            <p>
+                Dompel je twee verschillende metalen elektroden (<strong>kathode</strong> en
+                <strong>anode</strong>) in een geleidende vloeistof (het <strong>elektrolyt</strong>), dan
+                ontstaat er door een chemische reactie tussen de elektroden en het elektrolyt een
+                spanningsverschil. Een voltmeter over de elektroden meet deze spanning.
+            </p>
+            <p class="note">
+                Dit is het werkingsprincipe van batterijen en accu's.
+            </p>
+        </div>
+
+        <div class="methode" id="thermokoppel">
+            <h3>1.4 Thermokoppel</h3>
+            <span class="figref">Figuur 1.4 &middot; Thermokoppel</span>
+            <p>
+                Verbind je twee verschillende metalen &mdash; bijvoorbeeld <strong>koper</strong> en
+                <strong>constantaan</strong> &mdash; op twee punten (T<sub>1</sub> en T<sub>2</sub>) met elkaar,
+                dan ontstaat er een kleine spanning (in millivolt, mV) zodra er een temperatuurverschil is tussen
+                die twee verbindingspunten. Dit heet het <strong>thermo-elektrisch effect</strong>
+                (Seebeck-effect).
+            </p>
+            <p class="note">
+                Thermokoppels worden gebruikt om temperatuur te meten, bijvoorbeeld in cv-ketels en industriële
+                ovens.
+            </p>
+        </div>
+
+        <div class="methode" id="zonnepaneel">
+            <h3>1.6 Opbouw zonnepaneel</h3>
+            <span class="figref">Figuur 1.6 &middot; Opbouw zonnepaneel</span>
+            <p>
+                Een zonnepaneel bestaat uit een frame van geanodiseerd aluminium, gehard hoogdoorlatend glas, een
+                laag EVA (ethyleen-vinyl-acetaat), meestal 36 monokristallijne cellen in serie, een laag
+                fiberglas en een achterzijde van Tedlar/PET/Tedlar-laminaat, afgedicht met siliconen. Licht dat
+                op de cellen valt, wekt via het <strong>foto-elektrisch effect</strong> een spanning op tussen de
+                cellen.
+            </p>
+            <p class="note">
+                Door cellen in serie te schakelen, wordt de spanning van het paneel opgeteld tot een bruikbare
+                waarde (bijvoorbeeld voor gelijkstroom richting een omvormer).
+            </p>
+        </div>
+
+        <div class="methode" id="piezo">
+            <h3>1.8 Piëzo-element</h3>
+            <span class="figref">Figuur 1.8 &middot; Piëzo-element</span>
+            <p>
+                Klem je een <strong>piëzomateriaal</strong> vast (bijvoorbeeld tussen een houtklem) en oefen je
+                mechanische druk of vervorming uit, dan ontstaat er in het materiaal een spanning. Dit heet het
+                <strong>piëzo-elektrisch effect</strong>. Een meter over het materiaal toont de opgewekte
+                spanning.
+            </p>
+            <p class="note">
+                Piëzo-elementen worden onder andere gebruikt in aanstekers, microfoons en sensoren die druk of
+                trillingen meten.
+            </p>
+        </div>
     </section>
 
-    <section id="chemisch" class="methode">
-        <h2 id="chemisch-h">1.3 Spanning door scheikundige werking</h2>
-        <span class="figref">Figuur 1.3 &middot; Spanning door scheikundige werking</span>
-        <p>
-            Dompel je twee verschillende metalen elektroden (<strong>kathode</strong> en <strong>anode</strong>)
-            in een geleidende vloeistof (het <strong>elektrolyt</strong>), dan ontstaat er door een chemische
-            reactie tussen de elektroden en het elektrolyt een spanningsverschil. Een voltmeter over de
-            elektroden meet deze spanning.
-        </p>
-        <p class="note">
-            Dit is het werkingsprincipe van batterijen en accu's.
-        </p>
-    </section>
-
-    <section id="thermokoppel" class="methode">
-        <h2 id="thermokoppel-h">1.4 Thermokoppel</h2>
-        <span class="figref">Figuur 1.4 &middot; Thermokoppel</span>
-        <p>
-            Verbind je twee verschillende metalen &mdash; bijvoorbeeld <strong>koper</strong> en
-            <strong>constantaan</strong> &mdash; op twee punten (T<sub>1</sub> en T<sub>2</sub>) met elkaar, dan
-            ontstaat er een kleine spanning (in millivolt, mV) zodra er een temperatuurverschil is tussen die
-            twee verbindingspunten. Dit heet het <strong>thermo-elektrisch effect</strong> (Seebeck-effect).
-        </p>
-        <p class="note">
-            Thermokoppels worden gebruikt om temperatuur te meten, bijvoorbeeld in cv-ketels en industriële
-            ovens.
-        </p>
-    </section>
-
-    <section id="zonnepaneel" class="methode">
-        <h2 id="zonnepaneel-h">1.6 Opbouw zonnepaneel</h2>
-        <span class="figref">Figuur 1.6 &middot; Opbouw zonnepaneel</span>
-        <p>
-            Een zonnepaneel bestaat uit een frame van geanodiseerd aluminium, gehard hoogdoorlatend glas, een
-            laag EVA (ethyleen-vinyl-acetaat), meestal 36 monokristallijne cellen in serie, een laag fiberglas
-            en een achterzijde van Tedlar/PET/Tedlar-laminaat, afgedicht met siliconen. Licht dat op de cellen
-            valt, wekt via het <strong>foto-elektrisch effect</strong> een spanning op tussen de cellen.
-        </p>
-        <p class="note">
-            Door cellen in serie te schakelen, wordt de spanning van het paneel opgeteld tot een bruikbare
-            waarde (bijvoorbeeld voor gelijkstroom richting een omvormer).
-        </p>
-    </section>
-
-    <section id="piezo" class="methode">
-        <h2 id="piezo-h">1.8 Piëzo-element</h2>
-        <span class="figref">Figuur 1.8 &middot; Piëzo-element</span>
-        <p>
-            Klem je een <strong>piëzomateriaal</strong> vast (bijvoorbeeld tussen een houtklem) en oefen je
-            mechanische druk of vervorming uit, dan ontstaat er in het materiaal een spanning. Dit heet het
-            <strong>piëzo-elektrisch effect</strong>. Een meter over het materiaal toont de opgewekte spanning.
-        </p>
-        <p class="note">
-            Piëzo-elementen worden onder andere gebruikt in aanstekers, microfoons en sensoren die druk of
-            trillingen meten.
-        </p>
-    </section>
-
-    <section id="samenvatting">
-        <h2>Samenvatting</h2>
+    <section>
+        <h3>Samenvatting &mdash; manieren om spanning op te wekken</h3>
         <table>
             <tr><th>Methode</th><th>Effect</th><th>Voorbeeldtoepassing</th></tr>
             <tr><td>Inductiespanning</td><td>Elektromagnetische inductie</td><td>Generator, dynamo</td></tr>
@@ -247,9 +278,51 @@
             <tr><td>Zonnepaneel</td><td>Foto-elektrisch</td><td>Zonnestroom (PV)</td></tr>
             <tr><td>Piëzo-element</td><td>Piëzo-elektrisch</td><td>Druksensor, aansteker</td></tr>
         </table>
+    </section>
+</main>
+
+<h2 class="topic">Elektrische lading</h2>
+<main>
+    <section id="atoommodel">
+        <h3>1.11 Atoommodel</h3>
+        <span class="figref">Figuur 1.11 &middot; Atoommodel</span>
+        <p>
+            Elk atoom bestaat uit een <strong>kern</strong> met daaromheen &eacute;&eacute;n of meer
+            <strong>elektronen</strong>. De kern is positief geladen, de elektronen die eromheen bewegen zijn
+            negatief geladen. Normaal gesproken is een atoom neutraal: het aantal negatieve elektronen is dan
+            gelijk aan het aantal positieve deeltjes in de kern.
+        </p>
+    </section>
+
+    <section id="deeltjes">
+        <h3>1.12 Deeltjes met hun lading</h3>
+        <span class="figref">Figuur 1.12 &middot; Deeltjes met hun lading</span>
+        <p>Een atoom is opgebouwd uit drie soorten deeltjes:</p>
+        <table>
+            <tr><th>Deeltje</th><th>Bevindt zich</th><th>Lading</th></tr>
+            <tr><td>Elektron</td><td>Rond de kern</td><td>Negatief (&minus;)</td></tr>
+            <tr><td>Proton</td><td>In de kern</td><td>Positief (+)</td></tr>
+            <tr><td>Neutron</td><td>In de kern</td><td>Neutraal (&bull;)</td></tr>
+        </table>
         <p class="note">
-            Deze pagina volgt paragraaf 1.1 "Spanning" uit een inleidend lesboek elektrotechniek en is bedoeld
-            als samenvatting, geen vervanging van het volledige lesmateriaal.
+            Legenda: (+) = positief geladen, (&minus;) = negatief geladen, (&bull;) = neutraal (geen lading).
+        </p>
+    </section>
+
+    <section id="stroomkring">
+        <h3>1.14 Uitvergroting stroomkring</h3>
+        <span class="figref">Figuur 1.14 &middot; Uitvergroting' stroomkring</span>
+        <p>
+            Sluit je een spanningsbron (met een plus- en een minpool) aan op een geleider, dan ontstaat er een
+            elektrisch veld in die geleider. De vrije elektronen in de atomen van de geleider worden daardoor in
+            beweging gezet: ze bewegen van de minpool naar de pluspool van de bron. Deze gerichte beweging van
+            elektronen is de elektrische <strong>stroom</strong>.
+        </p>
+        <p class="note">
+            Let op: de afgesproken (conventionele) stroomrichting in een schema loopt van + naar &minus; buiten
+            de bron, terwijl de elektronen zelf in de tegenovergestelde richting bewegen (van &minus; naar +).
+            Zolang de schakelaar open staat (X in het schema), is de stroomkring onderbroken en loopt er geen
+            stroom.
         </p>
     </section>
 </main>
