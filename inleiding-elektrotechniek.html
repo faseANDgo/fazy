@@ -160,6 +160,7 @@
             <h4>Spanning</h4>
             <div class="toc">
                 <a href="#wat-is-spanning">Wat is spanning?</a>
+                <a href="#simpel-voorgesteld">Simpel voorgesteld</a>
                 <a href="#inductie">1.2 Inductiespanning</a>
                 <a href="#chemisch">1.3 Spanning door scheikundige werking</a>
                 <a href="#thermokoppel">1.4 Thermokoppel</a>
@@ -175,6 +176,14 @@
                 <a href="#stroomkring">1.14 Uitvergroting stroomkring</a>
             </div>
         </div>
+        <div class="toc-group">
+            <h4>Stroom, energie en vermogen</h4>
+            <div class="toc">
+                <a href="#coulomb">1.8 Elektrische stroom (Coulomb)</a>
+                <a href="#formuleoverzicht">Formuleoverzicht</a>
+                <a href="#omzetten-energie">1.20 Omzetten van energie</a>
+            </div>
+        </div>
     </section>
 </main>
 
@@ -187,6 +196,37 @@
             elektrisch potentiaal tussen twee punten. Dat verschil is nodig om lading in beweging te krijgen,
             dus om stroom te laten lopen. Er bestaan meerdere natuurkundige verschijnselen waarmee je spanning
             kunt opwekken. Hieronder staan vijf van de meest gebruikte principes.
+        </p>
+    </section>
+
+    <section id="simpel-voorgesteld">
+        <h3>Simpel voorgesteld: spanning is relatief</h3>
+        <p>
+            Spanning bestaat altijd tussen <strong>twee punten</strong> &mdash; je kunt niet zeggen "dit punt
+            heeft 1,5&nbsp;V" zonder aan te geven waar je vanaf meet. Kies je een van de twee punten als
+            <strong>referentiepunt</strong> (0,0&nbsp;V), dan is de spanning op het andere punt simpelweg het
+            verschil ten opzichte van dat referentiepunt.
+        </p>
+        <svg viewBox="0 0 400 210" role="img" aria-label="Schema van een 1,5 V batterij met een lamp, waarbij het minpunt op 0,0 V en het pluspunt op 1,5 V staat" style="width:100%; max-width:420px; display:block; margin:12px auto; font-family:Arial, sans-serif;">
+            <rect x="60" y="40" width="280" height="140" fill="none" stroke="#1f2328" stroke-width="3" />
+            <rect x="150" y="30" width="100" height="20" fill="#f7f8fa" />
+            <line x1="185" y1="25" x2="185" y2="55" stroke="#1f2328" stroke-width="2" />
+            <line x1="215" y1="15" x2="215" y2="65" stroke="#1f2328" stroke-width="4" />
+            <text x="200" y="15" text-anchor="middle" font-size="16" fill="#1f2328">1,5 V</text>
+            <text x="182" y="45" text-anchor="middle" font-size="14" fill="#1f2328">&minus;</text>
+            <text x="222" y="45" text-anchor="middle" font-size="14" fill="#1f2328">+</text>
+            <circle cx="200" cy="180" r="16" fill="#fde68a" stroke="#1f2328" stroke-width="2" />
+            <line x1="189" y1="169" x2="211" y2="191" stroke="#1f2328" stroke-width="2" />
+            <line x1="211" y1="169" x2="189" y2="191" stroke="#1f2328" stroke-width="2" />
+            <circle cx="60" cy="40" r="4" fill="#2563eb" />
+            <circle cx="340" cy="40" r="4" fill="#2563eb" />
+            <text x="60" y="25" text-anchor="middle" font-size="15" fill="#2563eb" font-weight="bold">0,0 V</text>
+            <text x="340" y="25" text-anchor="middle" font-size="15" fill="#2563eb" font-weight="bold">1,5 V</text>
+        </svg>
+        <p class="note">
+            Het minpunt van de batterij wordt hier als referentie gekozen (0,0&nbsp;V). Het pluspunt staat dan op
+            1,5&nbsp;V &mdash; precies de spanning die de batterij levert. Kies je een ander referentiepunt, dan
+            veranderen de afgelezen waarden mee, maar het <em>verschil</em> tussen de twee punten blijft 1,5&nbsp;V.
         </p>
     </section>
 
@@ -323,6 +363,92 @@
             de bron, terwijl de elektronen zelf in de tegenovergestelde richting bewegen (van &minus; naar +).
             Zolang de schakelaar open staat (X in het schema), is de stroomkring onderbroken en loopt er geen
             stroom.
+        </p>
+    </section>
+</main>
+
+<h2 class="topic">Stroom, energie en vermogen</h2>
+<main>
+    <section id="coulomb">
+        <h3>1.8 Elektrische stroom &mdash; de Coulomb</h3>
+        <span class="figref">Figuur 1.8 &middot; Elektrische stroom</span>
+        <p>
+            Elektrische <strong>stroom</strong> is een verplaatsing van lading door een geleider: heel veel
+            kleine ladingsdragers (elektronen) die zich gericht verplaatsen. De hoeveelheid lading die per
+            seconde verplaatst wordt, drukken we uit in <strong>coulomb (C)</strong>.
+        </p>
+        <div class="formula">Q = I &times; t</div>
+        <p class="note">
+            Q = lading (coulomb, C) &middot; I = stroom (ampère, A) &middot; t = tijd (seconde, s).
+            Eén coulomb is de hoeveelheid lading die verplaatst wordt door een stroom van 1&nbsp;A gedurende
+            1&nbsp;seconde.
+        </p>
+        <p>
+            Voeg je daar ook de spanning aan toe, dan krijg je <strong>energie</strong> (in joule, J):
+        </p>
+        <div class="formula">W = U &times; I &times; t</div>
+        <p class="note">
+            Energie per seconde is <strong>vermogen</strong> (in watt, W): P = U &times; I.
+        </p>
+    </section>
+
+    <section id="formuleoverzicht">
+        <h3>Formuleoverzicht</h3>
+        <table>
+            <tr><th>Symbool</th><th>Betekenis</th><th>Eenheid</th></tr>
+            <tr><td>U</td><td>Spanning</td><td>volt (V)</td></tr>
+            <tr><td>I</td><td>Stroom</td><td>ampère (A)</td></tr>
+            <tr><td>R</td><td>Weerstand</td><td>ohm (&Omega;)</td></tr>
+            <tr><td>W</td><td>Energie</td><td>joule (J)</td></tr>
+            <tr><td>P</td><td>Vermogen</td><td>watt (W)</td></tr>
+            <tr><td>&eta;</td><td>Rendement</td><td>&ndash;</td></tr>
+            <tr><td>n</td><td>Toerental</td><td>omw/min</td></tr>
+            <tr><td>T<sub>as</sub></td><td>As-koppel</td><td>Nm</td></tr>
+        </table>
+        <div class="formula">
+            Q = I &middot; t<br>
+            U = I &middot; R<br>
+            W = Q &middot; U = U &middot; I &middot; t = I&sup2; &middot; R &middot; t<br>
+            P = U &middot; I = I&sup2; &middot; R = U&sup2; / R<br>
+            &eta; = W<sub>a</sub> / W<sub>t</sub> = P<sub>a</sub> / P<sub>t</sub><br>
+            T<sub>as</sub> = 9,55 &middot; P<sub>a</sub> / n
+        </div>
+        <p class="note">
+            &eta; (rendement) is de verhouding tussen afgegeven (a) en toegevoerde (t) energie of vermogen &mdash;
+            altijd een waarde tussen 0 en 1 (of 0&ndash;100%). T<sub>as</sub> is het koppel op een draaiende as,
+            berekend uit het afgegeven vermogen P<sub>a</sub> en het toerental n.
+        </p>
+    </section>
+
+    <section id="omzetten-energie">
+        <h3>1.20 Omzetten van energie</h3>
+        <span class="figref">Figuur 1.20 &middot; Omzetten van energie</span>
+        <p>
+            Elke machine die energie omzet &mdash; bijvoorbeeld een elektromotor die elektrische energie omzet in
+            mechanische energie via een draaiende as &mdash; krijgt vermogen toegevoerd (W<sub>toe</sub>) en geeft
+            vermogen af (W<sub>af</sub>). Niet alles wat je erin stopt, komt er nuttig weer uit: een deel gaat
+            verloren (W<sub>verlies</sub>), bijvoorbeeld als warmte door wrijving of weerstand.
+        </p>
+        <svg viewBox="0 0 400 170" role="img" aria-label="Blokschema van energieomzetting: Wtoe in, via een draaiende as naar Waf, met Wverlies naar beneden" style="width:100%; max-width:420px; display:block; margin:12px auto; font-family:Arial, sans-serif;">
+            <rect x="140" y="45" width="120" height="70" fill="#eef2ff" stroke="#1f2328" stroke-width="2" />
+            <circle cx="200" cy="80" r="10" fill="none" stroke="#1f2328" stroke-width="2" />
+            <text x="200" y="130" text-anchor="middle" font-size="12" fill="#5b6472">draaiende as</text>
+            <line x1="40" y1="80" x2="140" y2="80" stroke="#1f2328" stroke-width="2" marker-end="url(#arrowhead)" />
+            <text x="40" y="70" font-size="14" fill="#1f2328">W<tspan baseline-shift="sub" font-size="10">toe</tspan></text>
+            <line x1="260" y1="80" x2="360" y2="80" stroke="#1f2328" stroke-width="2" marker-end="url(#arrowhead)" />
+            <text x="325" y="70" font-size="14" fill="#1f2328">W<tspan baseline-shift="sub" font-size="10">af</tspan></text>
+            <line x1="200" y1="115" x2="200" y2="155" stroke="#1f2328" stroke-width="2" marker-end="url(#arrowhead)" />
+            <text x="205" y="150" font-size="14" fill="#1f2328">W<tspan baseline-shift="sub" font-size="10">verlies</tspan></text>
+            <defs>
+                <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#1f2328" />
+                </marker>
+            </defs>
+        </svg>
+        <p class="note">
+            Het rendement &eta; = W<sub>af</sub> / W<sub>toe</sub> (of P<sub>a</sub> / P<sub>t</sub>) drukt uit
+            welk deel van de toegevoerde energie nuttig wordt omgezet. Hoe kleiner W<sub>verlies</sub>, hoe hoger
+            het rendement.
         </p>
     </section>
 </main>
