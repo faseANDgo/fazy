@@ -51,7 +51,7 @@ $template = @'
            border-radius:6px; padding:8px 12px; cursor:pointer; }
   button:hover { border-color:var(--accent); }
   #licznik { color:var(--muted); font-size:12px; white-space:nowrap; }
-  .grid { display:grid; grid-template-columns:30px 26px minmax(120px,1.1fr) 50px minmax(90px,.9fr) minmax(200px,3fr) 84px 110px minmax(80px,.8fr);
+  .grid { display:grid; grid-template-columns:30px 26px minmax(120px,1.1fr) 86px minmax(90px,.9fr) minmax(200px,3fr) 84px 110px minmax(80px,.8fr);
           column-gap:12px; align-items:center; }
   .head { padding:4px 16px; color:var(--muted); font-weight:600; font-size:13px; }
   .head button { all:unset; cursor:pointer; text-align:left; }
