@@ -1,0 +1,14 @@
+plik;typ;lokalizacja;opis;rewizja;data
+14076000;EL;PRO01_OV11-20;Installatieschema + Vooraanzicht HV-3-OV12 Productiehal 1, aanvoer blik/glas;1;30-8-2022
+12110860;EL;PRO02;TD-UPS-VERDELER Serverruimte TD;1;28-8-2022
+17113700;EL;PRO01;Installatieschema 1600 A Hoofdverdeler HV-5B;1;26-8-2022
+15070500;EL;MAG;Elektrische installaties Plattegrond Magazijn 2, Magazijn 6;6;25-8-2022
+15070600;EL;MAG;Elektrische installaties Plattegrond Magazijn 7, Magazijn 8;3;24-8-2022
+15070800;EL;MAG;Elektrische installaties Plattegrond Magazijn 4;2;24-8-2022
+ex15050100;IA;INP01;Depalletiser (Niko) (133.20.000.014.4);29-7-2022;29-7-2022
+17120200;IA;PRO01_ATC20;Veldkast PRO01_ATC20_VDK04 Voedingswater Steriflow;2;25-7-2022
+22034400;EL;;Verdeler + Installatieschema magazijn 6, 7 & 8;0;1-4-2022
+14050200;IA;INP02;Schakelkast INP02-DEP01-SKK1 Aan-afvoerbanden (de-)pall installatie;4;21-2-2022
+05030200;IA;PRO02;Schakelkast Afvoer LAN/Toevoer Prasmatic Inpakmachine;14;21-10-2021
+12111000;IT;AWZ00;AWZ00_LAN01_NWK1 LAN1 Netwerkkast 1 Waterzuivering;4;15-9-2021
+01030500;IA;PRO01;Schakelkast Glasafschuiver Lijn 1;15;3-8-2021
