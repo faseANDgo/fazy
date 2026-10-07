@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schematy</title>
+<style>
+  :root { --bg:#000; --amber:#ffb000; --dim:#a87400; --line:#3a2800; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--amber);
+          font-family:"Courier New",ui-monospace,monospace; }
+  header { position:sticky; top:0; background:var(--bg); padding:1.2rem 1rem .8rem;
+            border-bottom:1px solid var(--line); z-index:1; }
+  .wrap { max-width:1000px; margin:0 auto; }
+  h1 { margin:0 0 .6rem; letter-spacing:.2em; text-transform:uppercase; font-size:1.4rem;
+        text-shadow:0 0 8px rgba(255,176,0,.5); }
+  #q { width:100%; padding:.6rem .8rem; font:inherit; font-size:1rem; color:var(--amber);
+        background:#0a0700; border:1px solid var(--dim); outline:none; }
+  #q:focus { border-color:var(--amber); box-shadow:0 0 8px rgba(255,176,0,.4); }
+  #q::placeholder { color:var(--dim); }
+  #licznik { color:var(--dim); font-size:.85rem; margin-top:.4rem; }
+  ul { list-style:none; margin:0; padding:1rem; display:grid;
+        grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+  a { display:flex; gap:.8rem; padding:.6rem .8rem; color:var(--amber); text-decoration:none;
+       border:1px solid var(--line); background:#070500; transition:.15s; }
+  a:hover, a:focus { border-color:var(--amber); background:#1a1200;
+                      box-shadow:0 0 10px rgba(255,176,0,.35); outline:none; }
+  .nr { color:var(--dim); }
+  a:hover .nr { color:var(--amber); }
+  li[hidden] { display:none; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>&gt; Schematy_</h1>
+  <input id="q" type="search" placeholder="szukaj schematu..." autofocus>
+  <div id="licznik"></div>
+</div></header>
+
+<main class="wrap">
+  <!-- Podmień href (nazwa pliku) i tekst w .nazwa. Każdy schemat to jedna linia <li>. -->
+  <ul id="lista">
+    <li><a href="schemat-001.pdf" target="_blank"><span class="nr">001</span><span class="nazwa">Schemat 001</span></a></li>
+    <li><a href="schemat-002.pdf" target="_blank"><span class="nr">002</span><span class="nazwa">Schemat 002</span></a></li>
+    <li><a href="schemat-003.pdf" target="_blank"><span class="nr">003</span><span class="nazwa">Schemat 003</span></a></li>
+    <li><a href="schemat-004.pdf" target="_blank"><span class="nr">004</span><span class="nazwa">Schemat 004</span></a></li>
+    <li><a href="schemat-005.pdf" target="_blank"><span class="nr">005</span><span class="nazwa">Schemat 005</span></a></li>
+    <li><a href="schemat-006.pdf" target="_blank"><span class="nr">006</span><span class="nazwa">Schemat 006</span></a></li>
+    <li><a href="schemat-007.pdf" target="_blank"><span class="nr">007</span><span class="nazwa">Schemat 007</span></a></li>
+    <li><a href="schemat-008.pdf" target="_blank"><span class="nr">008</span><span class="nazwa">Schemat 008</span></a></li>
+    <li><a href="schemat-009.pdf" target="_blank"><span class="nr">009</span><span class="nazwa">Schemat 009</span></a></li>
+    <li><a href="schemat-010.pdf" target="_blank"><span class="nr">010</span><span class="nazwa">Schemat 010</span></a></li>
+    <li><a href="schemat-011.pdf" target="_blank"><span class="nr">011</span><span class="nazwa">Schemat 011</span></a></li>
+    <li><a href="schemat-012.pdf" target="_blank"><span class="nr">012</span><span class="nazwa">Schemat 012</span></a></li>
+    <li><a href="schemat-013.pdf" target="_blank"><span class="nr">013</span><span class="nazwa">Schemat 013</span></a></li>
+    <li><a href="schemat-014.pdf" target="_blank"><span class="nr">014</span><span class="nazwa">Schemat 014</span></a></li>
+    <li><a href="schemat-015.pdf" target="_blank"><span class="nr">015</span><span class="nazwa">Schemat 015</span></a></li>
+    <li><a href="schemat-016.pdf" target="_blank"><span class="nr">016</span><span class="nazwa">Schemat 016</span></a></li>
+    <li><a href="schemat-017.pdf" target="_blank"><span class="nr">017</span><span class="nazwa">Schemat 017</span></a></li>
+    <li><a href="schemat-018.pdf" target="_blank"><span class="nr">018</span><span class="nazwa">Schemat 018</span></a></li>
+    <li><a href="schemat-019.pdf" target="_blank"><span class="nr">019</span><span class="nazwa">Schemat 019</span></a></li>
+    <li><a href="schemat-020.pdf" target="_blank"><span class="nr">020</span><span class="nazwa">Schemat 020</span></a></li>
+    <li><a href="schemat-021.pdf" target="_blank"><span class="nr">021</span><span class="nazwa">Schemat 021</span></a></li>
+    <li><a href="schemat-022.pdf" target="_blank"><span class="nr">022</span><span class="nazwa">Schemat 022</span></a></li>
+    <li><a href="schemat-023.pdf" target="_blank"><span class="nr">023</span><span class="nazwa">Schemat 023</span></a></li>
+    <li><a href="schemat-024.pdf" target="_blank"><span class="nr">024</span><span class="nazwa">Schemat 024</span></a></li>
+    <li><a href="schemat-025.pdf" target="_blank"><span class="nr">025</span><span class="nazwa">Schemat 025</span></a></li>
+    <li><a href="schemat-026.pdf" target="_blank"><span class="nr">026</span><span class="nazwa">Schemat 026</span></a></li>
+    <li><a href="schemat-027.pdf" target="_blank"><span class="nr">027</span><span class="nazwa">Schemat 027</span></a></li>
+    <li><a href="schemat-028.pdf" target="_blank"><span class="nr">028</span><span class="nazwa">Schemat 028</span></a></li>
+    <li><a href="schemat-029.pdf" target="_blank"><span class="nr">029</span><span class="nazwa">Schemat 029</span></a></li>
+    <li><a href="schemat-030.pdf" target="_blank"><span class="nr">030</span><span class="nazwa">Schemat 030</span></a></li>
+    <li><a href="schemat-031.pdf" target="_blank"><span class="nr">031</span><span class="nazwa">Schemat 031</span></a></li>
+    <li><a href="schemat-032.pdf" target="_blank"><span class="nr">032</span><span class="nazwa">Schemat 032</span></a></li>
+    <li><a href="schemat-033.pdf" target="_blank"><span class="nr">033</span><span class="nazwa">Schemat 033</span></a></li>
+    <li><a href="schemat-034.pdf" target="_blank"><span class="nr">034</span><span class="nazwa">Schemat 034</span></a></li>
+    <li><a href="schemat-035.pdf" target="_blank"><span class="nr">035</span><span class="nazwa">Schemat 035</span></a></li>
+    <li><a href="schemat-036.pdf" target="_blank"><span class="nr">036</span><span class="nazwa">Schemat 036</span></a></li>
+    <li><a href="schemat-037.pdf" target="_blank"><span class="nr">037</span><span class="nazwa">Schemat 037</span></a></li>
+    <li><a href="schemat-038.pdf" target="_blank"><span class="nr">038</span><span class="nazwa">Schemat 038</span></a></li>
+    <li><a href="schemat-039.pdf" target="_blank"><span class="nr">039</span><span class="nazwa">Schemat 039</span></a></li>
+    <li><a href="schemat-040.pdf" target="_blank"><span class="nr">040</span><span class="nazwa">Schemat 040</span></a></li>
+    <li><a href="schemat-041.pdf" target="_blank"><span class="nr">041</span><span class="nazwa">Schemat 041</span></a></li>
+    <li><a href="schemat-042.pdf" target="_blank"><span class="nr">042</span><span class="nazwa">Schemat 042</span></a></li>
+    <li><a href="schemat-043.pdf" target="_blank"><span class="nr">043</span><span class="nazwa">Schemat 043</span></a></li>
+    <li><a href="schemat-044.pdf" target="_blank"><span class="nr">044</span><span class="nazwa">Schemat 044</span></a></li>
+    <li><a href="schemat-045.pdf" target="_blank"><span class="nr">045</span><span class="nazwa">Schemat 045</span></a></li>
+    <li><a href="schemat-046.pdf" target="_blank"><span class="nr">046</span><span class="nazwa">Schemat 046</span></a></li>
+    <li><a href="schemat-047.pdf" target="_blank"><span class="nr">047</span><span class="nazwa">Schemat 047</span></a></li>
+    <li><a href="schemat-048.pdf" target="_blank"><span class="nr">048</span><span class="nazwa">Schemat 048</span></a></li>
+    <li><a href="schemat-049.pdf" target="_blank"><span class="nr">049</span><span class="nazwa">Schemat 049</span></a></li>
+    <li><a href="schemat-050.pdf" target="_blank"><span class="nr">050</span><span class="nazwa">Schemat 050</span></a></li>
+    <li><a href="schemat-051.pdf" target="_blank"><span class="nr">051</span><span class="nazwa">Schemat 051</span></a></li>
+    <li><a href="schemat-052.pdf" target="_blank"><span class="nr">052</span><span class="nazwa">Schemat 052</span></a></li>
+    <li><a href="schemat-053.pdf" target="_blank"><span class="nr">053</span><span class="nazwa">Schemat 053</span></a></li>
+    <li><a href="schemat-054.pdf" target="_blank"><span class="nr">054</span><span class="nazwa">Schemat 054</span></a></li>
+    <li><a href="schemat-055.pdf" target="_blank"><span class="nr">055</span><span class="nazwa">Schemat 055</span></a></li>
+    <li><a href="schemat-056.pdf" target="_blank"><span class="nr">056</span><span class="nazwa">Schemat 056</span></a></li>
+    <li><a href="schemat-057.pdf" target="_blank"><span class="nr">057</span><span class="nazwa">Schemat 057</span></a></li>
+    <li><a href="schemat-058.pdf" target="_blank"><span class="nr">058</span><span class="nazwa">Schemat 058</span></a></li>
+    <li><a href="schemat-059.pdf" target="_blank"><span class="nr">059</span><span class="nazwa">Schemat 059</span></a></li>
+    <li><a href="schemat-060.pdf" target="_blank"><span class="nr">060</span><span class="nazwa">Schemat 060</span></a></li>
+    <li><a href="schemat-061.pdf" target="_blank"><span class="nr">061</span><span class="nazwa">Schemat 061</span></a></li>
+    <li><a href="schemat-062.pdf" target="_blank"><span class="nr">062</span><span class="nazwa">Schemat 062</span></a></li>
+    <li><a href="schemat-063.pdf" target="_blank"><span class="nr">063</span><span class="nazwa">Schemat 063</span></a></li>
+    <li><a href="schemat-064.pdf" target="_blank"><span class="nr">064</span><span class="nazwa">Schemat 064</span></a></li>
+    <li><a href="schemat-065.pdf" target="_blank"><span class="nr">065</span><span class="nazwa">Schemat 065</span></a></li>
+    <li><a href="schemat-066.pdf" target="_blank"><span class="nr">066</span><span class="nazwa">Schemat 066</span></a></li>
+    <li><a href="schemat-067.pdf" target="_blank"><span class="nr">067</span><span class="nazwa">Schemat 067</span></a></li>
+    <li><a href="schemat-068.pdf" target="_blank"><span class="nr">068</span><span class="nazwa">Schemat 068</span></a></li>
+    <li><a href="schemat-069.pdf" target="_blank"><span class="nr">069</span><span class="nazwa">Schemat 069</span></a></li>
+    <li><a href="schemat-070.pdf" target="_blank"><span class="nr">070</span><span class="nazwa">Schemat 070</span></a></li>
+    <li><a href="schemat-071.pdf" target="_blank"><span class="nr">071</span><span class="nazwa">Schemat 071</span></a></li>
+    <li><a href="schemat-072.pdf" target="_blank"><span class="nr">072</span><span class="nazwa">Schemat 072</span></a></li>
+    <li><a href="schemat-073.pdf" target="_blank"><span class="nr">073</span><span class="nazwa">Schemat 073</span></a></li>
+    <li><a href="schemat-074.pdf" target="_blank"><span class="nr">074</span><span class="nazwa">Schemat 074</span></a></li>
+    <li><a href="schemat-075.pdf" target="_blank"><span class="nr">075</span><span class="nazwa">Schemat 075</span></a></li>
+    <li><a href="schemat-076.pdf" target="_blank"><span class="nr">076</span><span class="nazwa">Schemat 076</span></a></li>
+    <li><a href="schemat-077.pdf" target="_blank"><span class="nr">077</span><span class="nazwa">Schemat 077</span></a></li>
+    <li><a href="schemat-078.pdf" target="_blank"><span class="nr">078</span><span class="nazwa">Schemat 078</span></a></li>
+    <li><a href="schemat-079.pdf" target="_blank"><span class="nr">079</span><span class="nazwa">Schemat 079</span></a></li>
+    <li><a href="schemat-080.pdf" target="_blank"><span class="nr">080</span><span class="nazwa">Schemat 080</span></a></li>
+    <li><a href="schemat-081.pdf" target="_blank"><span class="nr">081</span><span class="nazwa">Schemat 081</span></a></li>
+    <li><a href="schemat-082.pdf" target="_blank"><span class="nr">082</span><span class="nazwa">Schemat 082</span></a></li>
+    <li><a href="schemat-083.pdf" target="_blank"><span class="nr">083</span><span class="nazwa">Schemat 083</span></a></li>
+    <li><a href="schemat-084.pdf" target="_blank"><span class="nr">084</span><span class="nazwa">Schemat 084</span></a></li>
+    <li><a href="schemat-085.pdf" target="_blank"><span class="nr">085</span><span class="nazwa">Schemat 085</span></a></li>
+    <li><a href="schemat-086.pdf" target="_blank"><span class="nr">086</span><span class="nazwa">Schemat 086</span></a></li>
+    <li><a href="schemat-087.pdf" target="_blank"><span class="nr">087</span><span class="nazwa">Schemat 087</span></a></li>
+    <li><a href="schemat-088.pdf" target="_blank"><span class="nr">088</span><span class="nazwa">Schemat 088</span></a></li>
+    <li><a href="schemat-089.pdf" target="_blank"><span class="nr">089</span><span class="nazwa">Schemat 089</span></a></li>
+    <li><a href="schemat-090.pdf" target="_blank"><span class="nr">090</span><span class="nazwa">Schemat 090</span></a></li>
+    <li><a href="schemat-091.pdf" target="_blank"><span class="nr">091</span><span class="nazwa">Schemat 091</span></a></li>
+    <li><a href="schemat-092.pdf" target="_blank"><span class="nr">092</span><span class="nazwa">Schemat 092</span></a></li>
+    <li><a href="schemat-093.pdf" target="_blank"><span class="nr">093</span><span class="nazwa">Schemat 093</span></a></li>
+    <li><a href="schemat-094.pdf" target="_blank"><span class="nr">094</span><span class="nazwa">Schemat 094</span></a></li>
+    <li><a href="schemat-095.pdf" target="_blank"><span class="nr">095</span><span class="nazwa">Schemat 095</span></a></li>
+    <li><a href="schemat-096.pdf" target="_blank"><span class="nr">096</span><span class="nazwa">Schemat 096</span></a></li>
+    <li><a href="schemat-097.pdf" target="_blank"><span class="nr">097</span><span class="nazwa">Schemat 097</span></a></li>
+    <li><a href="schemat-098.pdf" target="_blank"><span class="nr">098</span><span class="nazwa">Schemat 098</span></a></li>
+    <li><a href="schemat-099.pdf" target="_blank"><span class="nr">099</span><span class="nazwa">Schemat 099</span></a></li>
+    <li><a href="schemat-100.pdf" target="_blank"><span class="nr">100</span><span class="nazwa">Schemat 100</span></a></li>
+    <li><a href="schemat-101.pdf" target="_blank"><span class="nr">101</span><span class="nazwa">Schemat 101</span></a></li>
+    <li><a href="schemat-102.pdf" target="_blank"><span class="nr">102</span><span class="nazwa">Schemat 102</span></a></li>
+    <li><a href="schemat-103.pdf" target="_blank"><span class="nr">103</span><span class="nazwa">Schemat 103</span></a></li>
+    <li><a href="schemat-104.pdf" target="_blank"><span class="nr">104</span><span class="nazwa">Schemat 104</span></a></li>
+    <li><a href="schemat-105.pdf" target="_blank"><span class="nr">105</span><span class="nazwa">Schemat 105</span></a></li>
+    <li><a href="schemat-106.pdf" target="_blank"><span class="nr">106</span><span class="nazwa">Schemat 106</span></a></li>
+    <li><a href="schemat-107.pdf" target="_blank"><span class="nr">107</span><span class="nazwa">Schemat 107</span></a></li>
+    <li><a href="schemat-108.pdf" target="_blank"><span class="nr">108</span><span class="nazwa">Schemat 108</span></a></li>
+    <li><a href="schemat-109.pdf" target="_blank"><span class="nr">109</span><span class="nazwa">Schemat 109</span></a></li>
+    <li><a href="schemat-110.pdf" target="_blank"><span class="nr">110</span><span class="nazwa">Schemat 110</span></a></li>
+    <li><a href="schemat-111.pdf" target="_blank"><span class="nr">111</span><span class="nazwa">Schemat 111</span></a></li>
+    <li><a href="schemat-112.pdf" target="_blank"><span class="nr">112</span><span class="nazwa">Schemat 112</span></a></li>
+    <li><a href="schemat-113.pdf" target="_blank"><span class="nr">113</span><span class="nazwa">Schemat 113</span></a></li>
+    <li><a href="schemat-114.pdf" target="_blank"><span class="nr">114</span><span class="nazwa">Schemat 114</span></a></li>
+    <li><a href="schemat-115.pdf" target="_blank"><span class="nr">115</span><span class="nazwa">Schemat 115</span></a></li>
+    <li><a href="schemat-116.pdf" target="_blank"><span class="nr">116</span><span class="nazwa">Schemat 116</span></a></li>
+    <li><a href="schemat-117.pdf" target="_blank"><span class="nr">117</span><span class="nazwa">Schemat 117</span></a></li>
+    <li><a href="schemat-118.pdf" target="_blank"><span class="nr">118</span><span class="nazwa">Schemat 118</span></a></li>
+    <li><a href="schemat-119.pdf" target="_blank"><span class="nr">119</span><span class="nazwa">Schemat 119</span></a></li>
+    <li><a href="schemat-120.pdf" target="_blank"><span class="nr">120</span><span class="nazwa">Schemat 120</span></a></li>
+    <li><a href="schemat-121.pdf" target="_blank"><span class="nr">121</span><span class="nazwa">Schemat 121</span></a></li>
+    <li><a href="schemat-122.pdf" target="_blank"><span class="nr">122</span><span class="nazwa">Schemat 122</span></a></li>
+    <li><a href="schemat-123.pdf" target="_blank"><span class="nr">123</span><span class="nazwa">Schemat 123</span></a></li>
+    <li><a href="schemat-124.pdf" target="_blank"><span class="nr">124</span><span class="nazwa">Schemat 124</span></a></li>
+    <li><a href="schemat-125.pdf" target="_blank"><span class="nr">125</span><span class="nazwa">Schemat 125</span></a></li>
+    <li><a href="schemat-126.pdf" target="_blank"><span class="nr">126</span><span class="nazwa">Schemat 126</span></a></li>
+    <li><a href="schemat-127.pdf" target="_blank"><span class="nr">127</span><span class="nazwa">Schemat 127</span></a></li>
+    <li><a href="schemat-128.pdf" target="_blank"><span class="nr">128</span><span class="nazwa">Schemat 128</span></a></li>
+    <li><a href="schemat-129.pdf" target="_blank"><span class="nr">129</span><span class="nazwa">Schemat 129</span></a></li>
+    <li><a href="schemat-130.pdf" target="_blank"><span class="nr">130</span><span class="nazwa">Schemat 130</span></a></li>
+    <li><a href="schemat-131.pdf" target="_blank"><span class="nr">131</span><span class="nazwa">Schemat 131</span></a></li>
+    <li><a href="schemat-132.pdf" target="_blank"><span class="nr">132</span><span class="nazwa">Schemat 132</span></a></li>
+    <li><a href="schemat-133.pdf" target="_blank"><span class="nr">133</span><span class="nazwa">Schemat 133</span></a></li>
+    <li><a href="schemat-134.pdf" target="_blank"><span class="nr">134</span><span class="nazwa">Schemat 134</span></a></li>
+    <li><a href="schemat-135.pdf" target="_blank"><span class="nr">135</span><span class="nazwa">Schemat 135</span></a></li>
+    <li><a href="schemat-136.pdf" target="_blank"><span class="nr">136</span><span class="nazwa">Schemat 136</span></a></li>
+    <li><a href="schemat-137.pdf" target="_blank"><span class="nr">137</span><span class="nazwa">Schemat 137</span></a></li>
+    <li><a href="schemat-138.pdf" target="_blank"><span class="nr">138</span><span class="nazwa">Schemat 138</span></a></li>
+    <li><a href="schemat-139.pdf" target="_blank"><span class="nr">139</span><span class="nazwa">Schemat 139</span></a></li>
+    <li><a href="schemat-140.pdf" target="_blank"><span class="nr">140</span><span class="nazwa">Schemat 140</span></a></li>
+    <li><a href="schemat-141.pdf" target="_blank"><span class="nr">141</span><span class="nazwa">Schemat 141</span></a></li>
+    <li><a href="schemat-142.pdf" target="_blank"><span class="nr">142</span><span class="nazwa">Schemat 142</span></a></li>
+    <li><a href="schemat-143.pdf" target="_blank"><span class="nr">143</span><span class="nazwa">Schemat 143</span></a></li>
+    <li><a href="schemat-144.pdf" target="_blank"><span class="nr">144</span><span class="nazwa">Schemat 144</span></a></li>
+    <li><a href="schemat-145.pdf" target="_blank"><span class="nr">145</span><span class="nazwa">Schemat 145</span></a></li>
+    <li><a href="schemat-146.pdf" target="_blank"><span class="nr">146</span><span class="nazwa">Schemat 146</span></a></li>
+    <li><a href="schemat-147.pdf" target="_blank"><span class="nr">147</span><span class="nazwa">Schemat 147</span></a></li>
+    <li><a href="schemat-148.pdf" target="_blank"><span class="nr">148</span><span class="nazwa">Schemat 148</span></a></li>
+    <li><a href="schemat-149.pdf" target="_blank"><span class="nr">149</span><span class="nazwa">Schemat 149</span></a></li>
+    <li><a href="schemat-150.pdf" target="_blank"><span class="nr">150</span><span class="nazwa">Schemat 150</span></a></li>
+  </ul>
+</main>
+
+<script>
+  const q = document.getElementById('q'), lic = document.getElementById('licznik');
+  const els = [...document.querySelectorAll('#lista li')];
+  function filtruj() {
+    const t = q.value.toLowerCase().trim(); let n = 0;
+    els.forEach(li => { const ok = li.textContent.toLowerCase().includes(t); li.hidden = !ok; if (ok) n++; });
+    lic.textContent = n + ' / ' + els.length + ' schematów';
+  }
+  q.addEventListener('input', filtruj); filtruj();
+</script>
+</body>
+</html>
