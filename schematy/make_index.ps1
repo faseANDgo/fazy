@@ -39,7 +39,19 @@ $template = @'
           --muted:#a87400; --accent:#ffb000; --field:#0a0700; --font:"Courier New",ui-monospace,monospace; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--text); font:14px/1.35 var(--font); }
+  html, body { height:100%; overflow:hidden; }
+  .app { display:flex; height:100vh; }
+  #links { flex:1 1 auto; min-width:0; overflow:auto; }
   .wrap { max-width:1500px; margin:0 auto; padding:0 12px 24px; }
+  .split #links { flex:0 0 var(--lw,520px); }
+  .split .wrap { max-width:none; }
+  #splitter { display:none; flex:0 0 6px; cursor:col-resize; background:var(--rowh); touch-action:none; }
+  #splitter:hover { background:var(--accent); }
+  .split #splitter { display:block; }
+  .split .grid { grid-template-columns:26px minmax(90px,.9fr) 2fr 118px; }
+  .split .grid > :nth-child(1), .split .grid > :nth-child(4), .split .grid > :nth-child(5),
+  .split .grid > :nth-child(7), .split .grid > :nth-child(9) { display:none; }
+  a.row.sel { background:var(--rowh); border-color:var(--accent); }
   .tytul { font-size:22px; font-weight:600; margin:18px 0 6px; }
   .top { position:sticky; top:0; background:var(--bg); z-index:2; padding:12px 0 6px; }
   .bar { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
@@ -62,8 +74,8 @@ $template = @'
   a.row:hover, a.row:focus { background:var(--rowh); outline:none; border-color:var(--accent); }
   .opis { color:var(--muted); } a.row .muted { color:var(--muted); }
   svg { display:block; }
-  #viewer { position:fixed; inset:0; z-index:10; background:var(--bg); display:none; flex-direction:column; }
-  #viewer.open { display:flex; }
+  #viewer { display:none; flex:1 1 0; min-width:0; flex-direction:column; background:var(--bg); }
+  .split #viewer { display:flex; }
   .vbar { display:flex; gap:8px; align-items:center; padding:8px 12px; border-bottom:1px solid var(--muted); }
   .vtitle { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .vtitle span { color:var(--muted); margin-left:10px; }
@@ -76,10 +88,13 @@ $template = @'
     .grid { grid-template-columns:26px 1fr 90px; }
     .grid > :nth-child(1), .grid > :nth-child(4), .grid > :nth-child(5), .grid > :nth-child(7), .grid > :nth-child(9) { display:none; }
     .opis { grid-column:2 / 4; }
+    .split #links, .split #splitter { display:none; }
   }
 </style>
 </head>
 <body>
+<div class="app">
+<div id="links">
 <div class="wrap">
   <h1 class="tytul">Coroos Kapelle Schema's</h1>
   <div class="top">
@@ -92,16 +107,19 @@ $template = @'
   </div>
   <div id="lista"></div>
 </div>
+</div>
+<div id="splitter" title="Przeciągnij, aby zmienić szerokość"></div>
 
 <div id="viewer">
   <div class="vbar">
-    <button id="vterug" type="button" title="Wróć do listy (Esc)">&larr; Lista</button>
+    <button id="vterug" type="button" title="Zamknij podgląd (Esc)">&times; Zamknij</button>
     <button id="vprev" type="button" title="Poprzedni (strzałka w lewo)">&lsaquo;</button>
     <button id="vnext" type="button" title="Następny (strzałka w prawo)">&rsaquo;</button>
     <div class="vtitle" id="vtitel"></div>
     <a class="btn" id="vnieuw" target="_blank" rel="noopener">Nowa karta &#8599;</a>
   </div>
   <iframe id="vframe" title="PDF"></iframe>
+</div>
 </div>
 
 <script>
@@ -144,6 +162,12 @@ function render() {
     frag.append(a);
   });
   lijst.append(frag);
+  markeer();
+}
+
+function markeer() {
+  lijst.querySelectorAll('a.row').forEach(a =>
+    a.classList.toggle('sel', decodeURIComponent(a.getAttribute('href').slice(1)) === huidigId()));
 }
 
 function motyw(m) { document.documentElement.dataset.theme = m; try { localStorage.setItem('motyw', m); } catch (e) {} }
@@ -163,13 +187,14 @@ function openHash() {
   const o = document.createElement('span'); o.textContent = r.opis;
   vtitel.append(b, o);
   vframe.src = r.href; vnieuw.href = r.href;
-  viewer.classList.add('open'); document.body.style.overflow = 'hidden';
+  viewer.classList.add('open'); document.body.classList.add('split');
+  markeer(); const sel = lijst.querySelector('a.sel'); if (sel) sel.scrollIntoView({ block: 'nearest' });
   document.title = r.plik + ' \u2013 Schematy';
 }
 function sluit() {
   if (!viewer.classList.contains('open')) return;
   viewer.classList.remove('open'); vframe.src = 'about:blank';
-  document.body.style.overflow = ''; document.title = 'Schematy';
+  document.body.classList.remove('split'); markeer(); document.title = 'Schematy';
 }
 function stap(d) {
   const i = huidig.findIndex(x => x.plik === huidigId()), n = huidig[i + d];
@@ -183,6 +208,18 @@ document.addEventListener('keydown', e => {
   if (!viewer.classList.contains('open')) return;
   if (e.key === 'Escape') location.hash = ''; else if (e.key === 'ArrowLeft') stap(-1); else if (e.key === 'ArrowRight') stap(1);
 });
+// separator: przeciaganie zmienia szerokosc listy
+const splitter = document.getElementById('splitter');
+function setLw(x) {
+  const w = Math.max(280, Math.min(x, innerWidth - 300));
+  document.documentElement.style.setProperty('--lw', w + 'px');
+  return w;
+}
+splitter.addEventListener('pointerdown', e => splitter.setPointerCapture(e.pointerId));
+splitter.addEventListener('pointermove', e => {
+  if (splitter.hasPointerCapture(e.pointerId)) { const w = setLw(e.clientX); try { localStorage.setItem('lw', w); } catch (x) {} }
+});
+try { const w = localStorage.getItem('lw'); if (w) setLw(+w); } catch (e) {}
 openHash();
 </script>
 </body>
