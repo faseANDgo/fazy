@@ -62,6 +62,15 @@ $template = @'
   a.row:hover, a.row:focus { background:var(--rowh); outline:none; border-color:var(--accent); }
   .opis { color:var(--muted); } a.row .muted { color:var(--muted); }
   svg { display:block; }
+  #viewer { position:fixed; inset:0; z-index:10; background:var(--bg); display:none; flex-direction:column; }
+  #viewer.open { display:flex; }
+  .vbar { display:flex; gap:8px; align-items:center; padding:8px 12px; border-bottom:1px solid var(--muted); }
+  .vtitle { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .vtitle span { color:var(--muted); margin-left:10px; }
+  a.btn { font:inherit; color:var(--text); background:var(--field); border:1px solid var(--muted);
+          border-radius:6px; padding:8px 12px; text-decoration:none; white-space:nowrap; }
+  a.btn:hover { border-color:var(--accent); }
+  #vframe { flex:1; width:100%; border:0; background:#525659; }
   .leeg { color:var(--muted); padding:24px; text-align:center; }
   @media (max-width:820px) {
     .grid { grid-template-columns:26px 1fr 90px; }
@@ -84,13 +93,24 @@ $template = @'
   <div id="lista"></div>
 </div>
 
+<div id="viewer">
+  <div class="vbar">
+    <button id="vterug" type="button" title="Wróć do listy (Esc)">&larr; Lista</button>
+    <button id="vprev" type="button" title="Poprzedni (strzałka w lewo)">&lsaquo;</button>
+    <button id="vnext" type="button" title="Następny (strzałka w prawo)">&rsaquo;</button>
+    <div class="vtitle" id="vtitel"></div>
+    <a class="btn" id="vnieuw" target="_blank" rel="noopener">Nowa karta &#8599;</a>
+  </div>
+  <iframe id="vframe" title="PDF"></iframe>
+</div>
+
 <script>
 const DATA = @@DATA@@;
 const KOLUMNY = [['plik','Naam'],['typ','Discipline'],['lok','Groep'],['opis','Titel'],['rew','Revisie'],['data','Revisiedatum'],['ctrl','Controller']];
 const ICO_OK  = '<svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="var(--accent)"/><path d="M5 9.2l2.7 2.6L13 6.5" fill="none" stroke="var(--row)" stroke-width="1.8"/></svg>';
 const ICO_PDF = '<svg width="16" height="20" viewBox="0 0 16 20"><path d="M2 1h9l4 4v14H2z" fill="none" stroke="var(--muted)" stroke-width="1.2"/><rect x="4" y="9" width="8" height="3" fill="#c0392b"/><path d="M4 14h8M4 16.5h8" stroke="var(--muted)" stroke-width="1"/></svg>';
 
-let sleutel = 'data', oplopend = false;
+let sleutel = 'data', oplopend = false, huidig = [];
 const q = document.getElementById('q'), lijst = document.getElementById('lista'),
       lic = document.getElementById('licznik'), kop = document.getElementById('naglowki');
 
@@ -113,12 +133,13 @@ function render() {
   const t = q.value.toLowerCase().trim();
   const rijen = DATA.filter(r => !t || [r.plik, r.typ, r.lok, r.opis, r.rew, r.data, r.ctrl].join(' ').toLowerCase().includes(t))
     .sort((a, b) => { const x = waarde(a, sleutel), y = waarde(b, sleutel); return (x < y ? -1 : x > y ? 1 : 0) * (oplopend ? 1 : -1); });
+  huidig = rijen;
   lic.textContent = rijen.length + ' / ' + DATA.length;
   lijst.innerHTML = '';
   if (!rijen.length) { lijst.append(cel('Brak wyników', 'leeg')); return; }
   const frag = document.createDocumentFragment();
   rijen.forEach(r => {
-    const a = document.createElement('a'); a.className = 'grid row'; a.href = r.href; a.target = '_blank';
+    const a = document.createElement('a'); a.className = 'grid row'; a.href = '#' + encodeURIComponent(r.plik);
     a.append(ikona(ICO_OK), ikona(ICO_PDF), cel(r.plik), cel(r.typ), cel(r.lok), cel(r.opis, 'opis'), cel(r.rew), cel(r.data), cel(r.ctrl));
     frag.append(a);
   });
@@ -129,6 +150,40 @@ function motyw(m) { document.documentElement.dataset.theme = m; try { localStora
 document.getElementById('motyw').onclick = () => motyw(document.documentElement.dataset.theme === 'amber' ? 'sp' : 'amber');
 try { motyw(localStorage.getItem('motyw') || 'sp'); } catch (e) { motyw('sp'); }
 q.addEventListener('input', render); kopjes(); render();
+
+// --- podglad PDF w stronie; link do dokumentu = index.html#nazwa.pdf ---
+const viewer = document.getElementById('viewer'), vframe = document.getElementById('vframe'),
+      vtitel = document.getElementById('vtitel'), vnieuw = document.getElementById('vnieuw');
+function huidigId() { return decodeURIComponent(location.hash.slice(1)); }
+function openHash() {
+  const r = DATA.find(x => x.plik === huidigId());
+  if (!r) { sluit(); return; }
+  vtitel.textContent = '';
+  const b = document.createElement('b'); b.textContent = r.plik;
+  const o = document.createElement('span'); o.textContent = r.opis;
+  vtitel.append(b, o);
+  vframe.src = r.href; vnieuw.href = r.href;
+  viewer.classList.add('open'); document.body.style.overflow = 'hidden';
+  document.title = r.plik + ' \u2013 Schematy';
+}
+function sluit() {
+  if (!viewer.classList.contains('open')) return;
+  viewer.classList.remove('open'); vframe.src = 'about:blank';
+  document.body.style.overflow = ''; document.title = 'Schematy';
+}
+function stap(d) {
+  const i = huidig.findIndex(x => x.plik === huidigId()), n = huidig[i + d];
+  if (i >= 0 && n) location.replace('#' + encodeURIComponent(n.plik));
+}
+document.getElementById('vterug').onclick = () => { location.hash = ''; };
+document.getElementById('vprev').onclick = () => stap(-1);
+document.getElementById('vnext').onclick = () => stap(1);
+window.addEventListener('hashchange', openHash);
+document.addEventListener('keydown', e => {
+  if (!viewer.classList.contains('open')) return;
+  if (e.key === 'Escape') location.hash = ''; else if (e.key === 'ArrowLeft') stap(-1); else if (e.key === 'ArrowRight') stap(1);
+});
+openHash();
 </script>
 </body>
 </html>
